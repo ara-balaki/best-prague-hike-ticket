@@ -1,6 +1,7 @@
 import { Field } from "@base-ui/react/field";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup } from "@base-ui/react/radio-group";
+import { usePostHog } from "@posthog/react";
 import Fuse from "fuse.js";
 import type React from "react";
 import { useState } from "react";
@@ -54,6 +55,7 @@ export function HybridStep({ stops }: HybridStepProps) {
 
   const stopValue = useWatch({ control, name: "stop" });
   const transport = useWatch({ control, name: "transport" }) ?? "all";
+  const posthog = usePostHog();
 
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState(() => stopValue ?? "");
@@ -83,6 +85,10 @@ export function HybridStep({ stops }: HybridStepProps) {
     setQuery(stop.name);
     setOpen(false);
     setValue("stop", stop.name, { shouldValidate: true });
+    posthog?.capture("stop_selected", {
+      stop_name: stop.name,
+      transport_filter: transport,
+    });
   }
 
   function clear() {
@@ -177,9 +183,10 @@ export function HybridStep({ stops }: HybridStepProps) {
       <div className="flex flex-col gap-2">
         <p className="text-sm font-bold text-black">Who's hiking?</p>
         <RadioGroup
-          onValueChange={(v: Party) =>
-            setValue("party", v, { shouldValidate: true })
-          }
+          onValueChange={(v: Party) => {
+            setValue("party", v, { shouldValidate: true });
+            posthog?.capture("party_selected", { party: v });
+          }}
           className="flex flex-col gap-2"
         >
           {PARTY_OPTIONS.map(({ value, title, description, icon }) => (

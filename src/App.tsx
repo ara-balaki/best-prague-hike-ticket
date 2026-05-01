@@ -1,8 +1,11 @@
+import { usePostHog } from "@posthog/react";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 
 import { HybridStep } from "./components/steps/HybridStep";
 import { ResultStep } from "./components/steps/ResultStep";
+import { cheapestTicket } from "./lib/ranking";
+import { getZoneInfo } from "./lib/transport";
 import type { FormValues, IStop, IStopsData } from "./types";
 
 interface StepConfig {
@@ -33,6 +36,7 @@ const STEPS: StepConfig[] = [
 function App() {
   const [stops, setStops] = useState<IStop[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
+  const posthog = usePostHog();
 
   useEffect(() => {
     fetch("/stops.json")
@@ -53,6 +57,22 @@ function App() {
   const goNext = async () => {
     const isValid = await form.trigger(step.fields);
     if (!isValid) return;
+    if (step.id === "hybrid") {
+      const { stop: stopName, party = "single", transport = "all" } = form.getValues();
+      const stop = stops.find((s) => s.name === stopName);
+      if (stop) {
+        const { count } = getZoneInfo(stop, transport);
+        const ticket = cheapestTicket(count, party);
+        posthog?.capture("ticket_found", {
+          stop_name: stopName,
+          party,
+          transport_filter: transport,
+          ticket_id: ticket.id,
+          ticket_name: ticket.name,
+          ticket_price: ticket.price,
+        });
+      }
+    }
     setCurrentStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
 
@@ -61,8 +81,31 @@ function App() {
   };
 
   const resetWizard = () => {
+    const { stop: stopName, party = "single", transport = "all" } = form.getValues();
+    posthog?.capture("new_search_started", {
+      previous_stop: stopName,
+      previous_party: party,
+      previous_transport_filter: transport,
+    });
     form.reset();
     setCurrentStep(0);
+  };
+
+  const handlePurchaseLinkClick = () => {
+    const { stop: stopName, party = "single", transport = "all" } = form.getValues();
+    const stop = stops.find((s) => s.name === stopName);
+    if (stop) {
+      const { count } = getZoneInfo(stop, transport);
+      const ticket = cheapestTicket(count, party);
+      posthog?.capture("purchase_link_clicked", {
+        stop_name: stopName,
+        party,
+        transport_filter: transport,
+        ticket_id: ticket.id,
+        ticket_name: ticket.name,
+        ticket_price: ticket.price,
+      });
+    }
   };
 
   const isResult = step.id === "result";
@@ -108,6 +151,7 @@ function App() {
                   onBack={goBack}
                   onNext={goNext}
                   onReset={resetWizard}
+                  onPurchaseLinkClick={handlePurchaseLinkClick}
                 />
               </div>
             </div>
@@ -138,6 +182,7 @@ interface NavButtonsProps {
   onBack: () => void;
   onNext: () => void;
   onReset: () => void;
+  onPurchaseLinkClick: () => void;
 }
 
 function NavButtons({
@@ -148,6 +193,7 @@ function NavButtons({
   onBack,
   onNext,
   onReset,
+  onPurchaseLinkClick,
 }: NavButtonsProps) {
   if (isResult) {
     return (
@@ -158,6 +204,7 @@ function NavButtons({
             href="https://pid.cz/en/pid-litacka/"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={onPurchaseLinkClick}
             className="underline hover:text-forest"
           >
             PID Lítačka app
