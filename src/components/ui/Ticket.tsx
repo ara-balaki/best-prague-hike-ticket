@@ -1,3 +1,4 @@
+import { formatPrice, formatValidity } from "../../lib/formaters";
 import { PARTY_LABELS } from "../../lib/transport";
 import type { ITicket } from "../../types";
 
@@ -7,19 +8,6 @@ interface TicketProps {
   routeTo: string;
   zoneLabel: string;
   partyLabel?: string;
-}
-
-function formatPrice(price: number): string {
-  return `${Math.round(price)} Kč`;
-}
-
-function formatValidity(
-  validity: number,
-  type: import("../../types").TicketValidityDuration,
-): string {
-  if (type === "day-cutoff") return "Until 4:00 AM next day";
-  if (validity >= 1440) return "24 hours";
-  return `${validity} minutes`;
 }
 
 interface CardProps {
@@ -49,7 +37,10 @@ function TicketCard({
         style={{ padding: "3.2cqi 4cqi 3.2cqi 5.5cqi" }}
       >
         {/* Top: brand + name left, price right */}
-        <div className="flex items-start justify-between" style={{ gap: "1cqi" }}>
+        <div
+          className="flex items-start justify-between"
+          style={{ gap: "1cqi" }}
+        >
           <div>
             <p
               className="font-semibold uppercase text-forest leading-none"
@@ -63,10 +54,24 @@ function TicketCard({
             >
               {name}
             </h3>
+            <div className="mt-2">
+              <p
+                className="text-muted leading-none"
+                style={{ fontSize: "2cqi" }}
+              >
+                Valid
+              </p>
+              <p
+                className="font-medium text-black"
+                style={{ marginTop: "0.3cqi", fontSize: "2.4cqi" }}
+              >
+                {validity}
+              </p>
+            </div>
           </div>
           <p
             className="shrink-0 font-bold text-forest"
-            style={{ fontSize: "4.8cqi" }}
+            style={{ fontSize: "5.4cqi" }}
           >
             {price}
           </p>
@@ -107,20 +112,6 @@ function TicketCard({
                 style={{ marginTop: "0.3cqi", fontSize: "2.4cqi" }}
               >
                 {partyDisplay}
-              </p>
-            </div>
-            <div>
-              <p
-                className="text-muted leading-none"
-                style={{ fontSize: "2cqi" }}
-              >
-                Valid
-              </p>
-              <p
-                className="font-medium text-black"
-                style={{ marginTop: "0.3cqi", fontSize: "2.4cqi" }}
-              >
-                {validity}
               </p>
             </div>
           </div>

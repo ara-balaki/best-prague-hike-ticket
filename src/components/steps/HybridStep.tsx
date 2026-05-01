@@ -3,7 +3,6 @@ import { Radio } from "@base-ui/react/radio";
 import { RadioGroup } from "@base-ui/react/radio-group";
 import { usePostHog } from "@posthog/react";
 import Fuse from "fuse.js";
-import type React from "react";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
@@ -23,25 +22,25 @@ const PARTY_OPTIONS: {
   value: Party;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: string;
 }[] = [
   {
     value: "single",
     title: "1 Adult",
     description: "Single adult",
-    icon: <SingleIcon />,
+    icon: "👤",
   },
   {
     value: "one-adult-two-children",
     title: "Small Group",
     description: "1 adult + max. 2 children",
-    icon: <SmallGroupIcon />,
+    icon: "👨‍👧‍👦",
   },
   {
     value: "two-adults-two-children",
     title: "Large Group",
     description: "2 adults + max. 4 children",
-    icon: <LargeGroupIcon />,
+    icon: "👨‍👩‍👧‍👦",
   },
 ];
 
@@ -128,7 +127,7 @@ export function HybridStep({ stops }: HybridStepProps) {
             onFocus={() => setOpen(true)}
             onBlur={() => setTimeout(() => setOpen(false), 150)}
             autoComplete="off"
-            className="w-full rounded-xl border-2 border-forest bg-transparent px-4 py-3 pr-10 text-base text-black outline-none placeholder:text-muted/60 focus:border-forest focus:ring-2 focus:ring-forest/20"
+            className="w-full rounded-xl border-2 border-forest/10  bg-transparent px-4 py-3 pr-10 text-base text-black outline-none placeholder:text-muted/60 focus:border-forest"
           />
           {query && (
             <button
@@ -187,7 +186,7 @@ export function HybridStep({ stops }: HybridStepProps) {
             setValue("party", v, { shouldValidate: true });
             posthog?.capture("party_selected", { party: v });
           }}
-          className="flex flex-col gap-2"
+          className="flex flex-col sm:flex-row gap-2"
         >
           {PARTY_OPTIONS.map(({ value, title, description, icon }) => (
             <Radio.Root
@@ -195,9 +194,7 @@ export function HybridStep({ stops }: HybridStepProps) {
               value={value}
               className="group flex w-full cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-cream-card px-3 py-3 transition-colors hover:border-forest/30 hover:bg-forest/5 data-checked:border-forest data-checked:bg-cream-card"
             >
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-b from-blue-200 to-blue-400 text-white">
-                {icon}
-              </div>
+              <span className="shrink-0 text-2xl leading-none">{icon}</span>
               <div className="flex flex-1 flex-col text-left">
                 <span className="text-sm font-semibold text-forest">
                   {title}
@@ -210,54 +207,5 @@ export function HybridStep({ stops }: HybridStepProps) {
         </RadioGroup>
       </div>
     </div>
-  );
-}
-
-function SingleIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden
-    >
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 22 C4 16 8 14 12 14 C16 14 20 16 20 22 Z" />
-    </svg>
-  );
-}
-
-function SmallGroupIcon() {
-  return (
-    <svg
-      width="24"
-      height="20"
-      viewBox="0 0 28 24"
-      fill="currentColor"
-      aria-hidden
-    >
-      <circle cx="10" cy="7" r="4" />
-      <path d="M2 22 C2 16 6 14 10 14 C14 14 18 16 18 22 Z" />
-      <circle cx="22" cy="11" r="2.5" />
-      <path d="M17 22 C17 18 19 16.5 22 16.5 C25 16.5 27 18 27 22 Z" />
-    </svg>
-  );
-}
-
-function LargeGroupIcon() {
-  return (
-    <svg
-      width="24"
-      height="20"
-      viewBox="0 0 32 24"
-      fill="currentColor"
-      aria-hidden
-    >
-      <circle cx="9" cy="7" r="4" />
-      <circle cx="22" cy="7" r="4" />
-      <path d="M1 22 C1 16 5 14 9 14 C13 14 17 16 17 22 Z" />
-      <path d="M14 22 C14 16 18 14 22 14 C26 14 30 16 30 22 Z" />
-    </svg>
   );
 }

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
+import { formatValidity } from "../../lib/formaters";
 import { cheapestTicket } from "../../lib/ranking";
 import { getZoneInfo, PARTY_LABELS } from "../../lib/transport";
 import type { FormValues, IStop } from "../../types";
@@ -39,7 +40,8 @@ export function ResultStep({ stops }: ResultStepProps) {
       {/* Summary — shown where description would be */}
       <p className="text-center text-base leading-relaxed text-muted text-balance">
         Your best option is the{" "}
-        <strong className="text-forest">{ticket.name}</strong> at{" "}
+        <strong className="text-forest">{ticket.name}</strong> valid for{" "}
+        {formatValidity(ticket.validity, ticket.type)} at{" "}
         <strong className="text-forest">{ticket.price} Kč</strong>.
       </p>
 
