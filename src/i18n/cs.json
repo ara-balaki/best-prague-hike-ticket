@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "Hledač jízdenek na výlety z Prahy",
+    "description": "Najděte nejlevnější denní jízdenku PID pro výlet na příměstské zastávky kolem Prahy. Zadejte cíl a velikost skupiny pro okamžité doporučení."
+  },
   "app": {
     "title": "Hledač jízdenek na výlety z Prahy",
     "description": "Najděte nejlepší jízdenku pro výlet na příměstské zastávky kolem Prahy. Zóny se počítají od středu města (P, 0, B)."

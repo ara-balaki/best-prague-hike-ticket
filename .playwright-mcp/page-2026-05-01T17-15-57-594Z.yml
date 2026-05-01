@@ -1,0 +1,39 @@
+- generic [ref=e4]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - paragraph [ref=e8]: ⛰️
+      - button "CS" [ref=e9]
+    - heading "Prague Hike Ticket Finder" [level=1] [ref=e10]
+    - paragraph [ref=e11]: Find the best ticket for your hike to suburban stops around Prague. Zones are counted from the city centre (P, 0, B).
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - generic [ref=e15]: Destination Stop
+        - textbox "Destination Stop" [active] [ref=e17]:
+          - /placeholder: e.g., Karlštejn, Turnov
+      - generic [ref=e18]:
+        - paragraph [ref=e19]: Who's hiking?
+        - radiogroup [ref=e20]:
+          - radio "👤 1 Adult Single adult" [ref=e21] [cursor=pointer]:
+            - generic [ref=e22]: 👤
+            - generic [ref=e23]:
+              - generic [ref=e24]: 1 Adult
+              - generic [ref=e25]: Single adult
+          - radio [ref=e26]
+          - radio "👨‍👧‍👦 Small Group 1 adult + max. 2 children" [ref=e27] [cursor=pointer]:
+            - generic [ref=e28]: 👨‍👧‍👦
+            - generic [ref=e29]:
+              - generic [ref=e30]: Small Group
+              - generic [ref=e31]: 1 adult + max. 2 children
+          - radio [ref=e32]
+          - radio "👨‍👩‍👧‍👦 Large Group 2 adults + max. 4 children" [ref=e33] [cursor=pointer]:
+            - generic [ref=e34]: 👨‍👩‍👧‍👦
+            - generic [ref=e35]:
+              - generic [ref=e36]: Large Group
+              - generic [ref=e37]: 2 adults + max. 4 children
+          - radio [ref=e38]
+    - button "Continue" [disabled] [ref=e41]
+  - paragraph [ref=e42]:
+    - text: Data sourced from
+    - link:
+      - /url: https://pid.cz/en/fares/
+    - text: pid.cz, valid for 2026.

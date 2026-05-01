@@ -10,7 +10,23 @@ import { cheapestTicket } from "./lib/ranking";
 import { getZoneInfo } from "./lib/transport";
 import type { FormValues, IStop, IStopsData } from "./types";
 
+function useDocumentMeta() {
+  const { t, i18n: inst } = useTranslation();
+  useEffect(() => {
+    document.documentElement.lang = inst.language;
+    document.title = t("meta.title");
+    const set = (sel: string, val: string) =>
+      document.querySelector(sel)?.setAttribute("content", val);
+    set('meta[name="description"]', t("meta.description"));
+    set('meta[property="og:title"]', t("meta.title"));
+    set('meta[property="og:description"]', t("meta.description"));
+    set('meta[name="twitter:title"]', t("meta.title"));
+    set('meta[name="twitter:description"]', t("meta.description"));
+  }, [inst.language, t]);
+}
+
 function App() {
+  useDocumentMeta();
   const { t } = useTranslation();
   const [stops, setStops] = useState<IStop[]>([]);
   const [currentStep, setCurrentStep] = useState(0);

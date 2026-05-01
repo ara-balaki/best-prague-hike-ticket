@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "Prague Hike Ticket Finder",
+    "description": "Find the cheapest PID day ticket for your hike to suburban stops around Prague. Enter your destination and group size for an instant recommendation."
+  },
   "app": {
     "title": "Prague Hike Ticket Finder",
     "description": "Find the best ticket for your hike to suburban stops around Prague. Zones are counted from the city centre (P, 0, B)."
