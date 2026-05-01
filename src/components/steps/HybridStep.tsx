@@ -58,6 +58,7 @@ export function HybridStep({ stops }: HybridStepProps) {
 
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState(() => stopValue ?? "");
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   const activeModes =
     transport === "all"
@@ -75,14 +76,15 @@ export function HybridStep({ stops }: HybridStepProps) {
     ],
     threshold: 0.35,
     distance: 80,
-    minMatchCharLength: 1,
+    minMatchCharLength: 2,
   });
 
-  const results = query.length >= 1 ? fuse.search(query, { limit: 5 }) : [];
+  const results = query.length >= 2 ? fuse.search(query, { limit: 10 }) : [];
 
   function pick(stop: IStop) {
     setQuery(stop.name);
     setOpen(false);
+    setActiveIndex(-1);
     setValue("stop", stop.name, { shouldValidate: true });
     posthog?.capture("stop_selected", {
       stop_name: stop.name,
@@ -93,6 +95,7 @@ export function HybridStep({ stops }: HybridStepProps) {
   function clear() {
     setQuery("");
     setOpen(false);
+    setActiveIndex(-1);
     setValue("stop", "", { shouldValidate: false });
   }
 
@@ -116,12 +119,24 @@ export function HybridStep({ stops }: HybridStepProps) {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setQuery(e.target.value);
               setOpen(true);
+              setActiveIndex(-1);
               setValue("stop", "", { shouldValidate: false });
             }}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === "Enter" && results.length > 0) {
+              if (!open || results.length === 0) return;
+              if (e.key === "ArrowDown") {
                 e.preventDefault();
-                pick(results[0].item);
+                setActiveIndex((i) => Math.min(i + 1, results.length - 1));
+              } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setActiveIndex((i) => Math.max(i - 1, 0));
+              } else if (e.key === "Enter") {
+                e.preventDefault();
+                const target = results[activeIndex >= 0 ? activeIndex : 0];
+                if (target) pick(target.item);
+              } else if (e.key === "Escape") {
+                setOpen(false);
+                setActiveIndex(-1);
               }
             }}
             onFocus={() => setOpen(true)}
@@ -143,7 +158,7 @@ export function HybridStep({ stops }: HybridStepProps) {
 
         {open && results.length > 0 && (
           <ul className="absolute top-full z-10 mt-1 max-h-60 w-full list-none overflow-y-auto rounded-xl border border-forest/20 bg-cream-card p-1 shadow-lg">
-            {results.map(({ item }) => {
+            {results.map(({ item }, idx) => {
               const servingModes = activeModes.filter((m) =>
                 isSuburban(item, m),
               );
@@ -151,7 +166,8 @@ export function HybridStep({ stops }: HybridStepProps) {
                 <li
                   key={item.name}
                   onMouseDown={() => pick(item)}
-                  className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm hover:bg-forest/10"
+                  onMouseEnter={() => setActiveIndex(idx)}
+                  className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm ${idx === activeIndex ? "bg-forest/10" : "hover:bg-forest/10"}`}
                 >
                   <span className="text-black">{item.name}</span>
                   <div className="flex shrink-0 gap-1">
