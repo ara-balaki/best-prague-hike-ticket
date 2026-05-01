@@ -1,6 +1,10 @@
 import { useTranslation } from "react-i18next";
 
-import { formatPrice } from "../../lib/formaters";
+import {
+  partyLabel as defaultPartyLabel,
+  ticketName,
+  ticketValidity,
+} from "../../lib/ticketDisplay";
 import type { ITicket } from "../../types";
 
 interface TicketProps {
@@ -134,22 +138,9 @@ export function Ticket({
 }: TicketProps) {
   const { t } = useTranslation();
 
-  const ticketNameKey: Record<string, string> = {
-    regional: "ticket.regional",
-    "whole-network": "ticket.wholeNetwork",
-    "family-one-adult": "ticket.familyOneAdult",
-    "family-two-adults": "ticket.familyTwoAdults",
-  };
-
-  const partyLabelKey: Record<string, string> = {
-    single: "partyLabels.single",
-    "one-adult-two-children": "partyLabels.oneAdultTwoChildren",
-    "two-adults-two-children": "partyLabels.twoAdultsFourChildren",
-  };
-
-  const name = t(ticketNameKey[ticket.id]);
-  const validity = t(`validity.${ticket.type === "day-cutoff" ? "cutoff" : "day"}`);
-  const partyDisplay = partyLabel ?? t(partyLabelKey[ticket.party]);
+  const name = ticketName(ticket, t);
+  const validity = ticketValidity(ticket, t);
+  const partyDisplay = partyLabel ?? defaultPartyLabel(ticket.party, t);
 
   const labels = {
     brand: t("ticket.brand"),
@@ -162,7 +153,7 @@ export function Ticket({
     <div className="@container mx-auto w-full sm:max-w-126 -rotate-2">
       <TicketCard
         name={name}
-        price={formatPrice(ticket.price)}
+        price={`${Math.round(ticket.price)} Kč`}
         validity={validity}
         routeFrom={routeFrom}
         routeTo={routeTo}

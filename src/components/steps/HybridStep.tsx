@@ -1,19 +1,32 @@
 import { Field } from "@base-ui/react/field";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup } from "@base-ui/react/radio-group";
-import { usePostHog } from "@posthog/react";
 import Fuse from "fuse.js";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-import {
-  isSuburban,
-  MODE_EMOJI,
-  MODE_LABEL,
-  SUBURBAN_MODES,
-} from "../../lib/transport";
-import type { FormValues, IStop, Party } from "../../types";
+import { useAnalytics } from "../../lib/analytics";
+import { isSuburban, SUBURBAN_MODES } from "../../lib/zones";
+import type { FormValues, IStop, Party, Transport } from "../../types";
+
+const MODE_LABEL: Record<Transport, string> = {
+  bus: "Bus",
+  ferry: "Ferry",
+  metro: "Metro",
+  train: "Train",
+  tram: "Tram",
+  trolleybus: "Trolleybus",
+};
+
+const MODE_EMOJI: Record<Transport, string> = {
+  bus: "🚌",
+  ferry: "⛴️",
+  metro: "🚇",
+  train: "🚆",
+  tram: "🚊",
+  trolleybus: "🚎",
+};
 
 interface HybridStepProps {
   stops: IStop[];
@@ -40,7 +53,7 @@ export function HybridStep({ stops }: HybridStepProps) {
 
   const stopValue = useWatch({ control, name: "stop" });
   const transport = useWatch({ control, name: "transport" }) ?? "all";
-  const posthog = usePostHog();
+  const analytics = useAnalytics();
 
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState(() => stopValue ?? "");
@@ -78,10 +91,7 @@ export function HybridStep({ stops }: HybridStepProps) {
     setActiveIndex(-1);
     setValue("stop", stop.name, { shouldValidate: true });
     setValue("zoneCount", undefined);
-    posthog?.capture("stop_selected", {
-      stop_name: stop.name,
-      transport_filter: transport,
-    });
+    analytics.stopSelected(stop.name, transport);
   }
 
   function pickZone(zone: number) {
@@ -90,7 +100,7 @@ export function HybridStep({ stops }: HybridStepProps) {
     setActiveIndex(-1);
     setValue("stop", `Zone ${zone}`, { shouldValidate: true });
     setValue("zoneCount", zone);
-    posthog?.capture("zone_selected", { zone });
+    analytics.zoneSelected(zone);
   }
 
   function clear() {
@@ -224,7 +234,7 @@ export function HybridStep({ stops }: HybridStepProps) {
         <RadioGroup
           onValueChange={(v: Party) => {
             setValue("party", v, { shouldValidate: true });
-            posthog?.capture("party_selected", { party: v });
+            analytics.partySelected(v);
           }}
           className="flex flex-col sm:flex-row gap-2"
         >
@@ -248,6 +258,23 @@ export function HybridStep({ stops }: HybridStepProps) {
           ))}
         </RadioGroup>
       </div>
+
+      {/* Prague pass */}
+      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 bg-cream-card px-3 py-3 hover:border-forest/30 hover:bg-forest/5">
+        <input
+          type="checkbox"
+          {...register("hasPraguePass", {
+            onChange: (e) => analytics.praguePassToggled(e.target.checked),
+          })}
+          className="mt-0.5 size-4 cursor-pointer accent-forest"
+        />
+        <div className="flex flex-1 flex-col text-left">
+          <span className="text-sm font-semibold text-forest">
+            {t("praguePass.label")}
+          </span>
+          <span className="text-xs text-muted">{t("praguePass.help")}</span>
+        </div>
+      </label>
     </div>
   );
 }

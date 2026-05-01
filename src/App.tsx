@@ -1,4 +1,3 @@
-import { usePostHog } from "@posthog/react";
 import i18n from "i18next";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
@@ -6,8 +5,9 @@ import { Trans, useTranslation } from "react-i18next";
 
 import { HybridStep } from "./components/steps/HybridStep";
 import { ResultStep } from "./components/steps/ResultStep";
+import { useAnalytics } from "./lib/analytics";
 import { cheapestTicket } from "./lib/ranking";
-import { getZoneInfo } from "./lib/transport";
+import { resolveTrip } from "./lib/trip";
 import type { FormValues, IStop, IStopsData } from "./types";
 
 function useDocumentMeta() {
@@ -29,8 +29,8 @@ function App() {
   useDocumentMeta();
   const { t } = useTranslation();
   const [stops, setStops] = useState<IStop[]>([]);
-  const [currentStep, setCurrentStep] = useState(0);
-  const posthog = usePostHog();
+  const [view, setView] = useState<"form" | "result">("form");
+  const analytics = useAnalytics();
 
   useEffect(() => {
     fetch("/stops.json")
@@ -43,71 +43,36 @@ function App() {
     defaultValues: {
       stop: "",
       transport: "all" as const,
+      hasPraguePass: false,
     },
   });
 
-  const goNext = async () => {
-    const fields: (keyof FormValues)[] = currentStep === 0 ? ["stop", "party"] : [];
-    const isValid = await form.trigger(fields);
+  const goToResult = async () => {
+    const isValid = await form.trigger(["stop", "party"]);
     if (!isValid) return;
-    if (currentStep === 0) {
-      const { stop: stopName, party = "single", transport = "all", zoneCount } = form.getValues();
-      const count = zoneCount ?? (() => {
-        const stop = stops.find((s) => s.name === stopName);
-        return stop ? getZoneInfo(stop, transport).count : null;
-      })();
-      if (count !== null) {
-        const ticket = cheapestTicket(count, party);
-        posthog?.capture("ticket_found", {
-          stop_name: stopName,
-          zone_count: count,
-          party,
-          transport_filter: transport,
-          ticket_id: ticket.id,
-          ticket_name: ticket.name,
-          ticket_price: ticket.price,
-        });
-      }
-    }
-    setCurrentStep((s) => Math.min(s + 1, 1));
+    const trip = resolveTrip(form.getValues(), stops);
+    if (trip) analytics.ticketFound(trip, cheapestTicket(trip));
+    setView("result");
   };
 
-  const goBack = () => setCurrentStep((s) => Math.max(s - 1, 0));
+  const goToForm = () => setView("form");
 
   const resetWizard = () => {
     const { stop: stopName, party = "single", transport = "all" } = form.getValues();
-    posthog?.capture("new_search_started", {
-      previous_stop: stopName,
-      previous_party: party,
-      previous_transport_filter: transport,
-    });
+    analytics.newSearchStarted({ stopName, party, transport });
     form.reset();
-    setCurrentStep(0);
+    setView("form");
   };
 
   const handlePurchaseLinkClick = () => {
-    const { stop: stopName, party = "single", transport = "all", zoneCount } = form.getValues();
-    const count = zoneCount ?? (() => {
-      const stop = stops.find((s) => s.name === stopName);
-      return stop ? getZoneInfo(stop, transport).count : null;
-    })();
-    if (count !== null) {
-      const ticket = cheapestTicket(count, party);
-      posthog?.capture("purchase_link_clicked", {
-        stop_name: stopName,
-        zone_count: count,
-        party,
-        transport_filter: transport,
-        ticket_id: ticket.id,
-        ticket_name: ticket.name,
-        ticket_price: ticket.price,
-      });
-    }
+    const trip = resolveTrip(form.getValues(), stops);
+    if (!trip) return;
+    analytics.purchaseClicked(trip, cheapestTicket(trip));
   };
 
   const stopValue = useWatch({ control: form.control, name: "stop" });
   const partyValue = useWatch({ control: form.control, name: "party" });
-  const canContinue = currentStep === 0 ? !!stopValue && !!partyValue : true;
+  const canContinue = view === "form" ? !!stopValue && !!partyValue : true;
 
   return (
     <FormProvider {...form}>
@@ -122,27 +87,27 @@ function App() {
                 <p className="text-3xl" aria-hidden>⛰️</p>
                 <LanguageSwitcher />
               </div>
-              {currentStep === 0 && (
+              {view === "form" && (
                 <h1 className="text-center text-2xl font-bold text-forest sm:text-3xl">
                   {t("app.title")}
                 </h1>
               )}
-              {currentStep === 0 && (
+              {view === "form" && (
                 <p className="text-center text-base leading-relaxed text-muted">
                   {t("app.description")}
                 </p>
               )}
               <div className="flex flex-1 flex-col">
-                {currentStep === 0 && <HybridStep stops={stops} />}
-                {currentStep === 1 && <ResultStep stops={stops} />}
+                {view === "form" && <HybridStep stops={stops} />}
+                {view === "result" && <ResultStep stops={stops} />}
               </div>
               <div className="mt-auto">
                 <NavButtons
-                  isResult={currentStep === 1}
+                  isResult={view === "result"}
                   canContinue={canContinue}
-                  showBack={currentStep > 0}
-                  onBack={goBack}
-                  onNext={goNext}
+                  showBack={view === "result"}
+                  onBack={goToForm}
+                  onNext={goToResult}
                   onReset={resetWizard}
                   onPurchaseLinkClick={handlePurchaseLinkClick}
                 />
@@ -172,13 +137,13 @@ function App() {
 
 function LanguageSwitcher() {
   const { i18n: inst } = useTranslation();
-  const posthog = usePostHog();
+  const analytics = useAnalytics();
 
   function toggle() {
     const next = inst.language === "en" ? "cs" : "en";
     i18n.changeLanguage(next);
     localStorage.setItem("lang", next);
-    posthog?.capture("language_changed", { language: next });
+    analytics.languageChanged(next);
   }
 
   return (

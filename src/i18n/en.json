@@ -33,6 +33,7 @@
   },
   "result": {
     "summary": "Your best option is the <strong>{{ticketName}}</strong> valid for {{validity}} at <strong>{{price}} Kč</strong>.",
+    "summaryShortTerm": "Your best option is the <strong>{{ticketName}}</strong> ({{validity}}). Buy one for each direction — {{quantity}} × {{perTicket}} Kč = <strong>{{total}} Kč</strong> round trip.",
     "cutoffWarning": "Valid <strong>until 4:00 AM the following day</strong>, not a full 24 hours.",
     "purchase": "Purchase via the <link>PID Lítačka app</link> or official PID channels.",
     "noStop": "No matching stop found. Please go back and pick a destination."
@@ -43,13 +44,20 @@
     "routeLabel": "Route",
     "hikersLabel": "Hikers",
     "regional": "Regional Ticket (zones 1–13)",
+    "pragueAnd14": "Prague + Zones 1–4 Day Ticket",
     "wholeNetwork": "Whole Network Ticket",
     "familyOneAdult": "1 Adult + max. 2 Children",
-    "familyTwoAdults": "2 Adults + max. 4 Children"
+    "familyTwoAdults": "2 Adults + max. 4 Children",
+    "shortTerm": "{{zones}}-zone Single Ticket"
+  },
+  "praguePass": {
+    "label": "I have a Prague PID pass",
+    "help": "Pre-paid pass for zones P, 0, B"
   },
   "validity": {
     "day": "24 hours",
-    "cutoff": "Until 4:00 AM next day"
+    "cutoff": "Until 4:00 AM next day",
+    "minutes": "{{count}} min"
   },
   "partyLabels": {
     "single": "1 Adult",

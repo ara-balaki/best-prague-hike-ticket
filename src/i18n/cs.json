@@ -33,6 +33,7 @@
   },
   "result": {
     "summary": "Nejlepší volbou je <strong>{{ticketName}}</strong> – {{validity}} za <strong>{{price}} Kč</strong>.",
+    "summaryShortTerm": "Nejlepší volbou je <strong>{{ticketName}}</strong> ({{validity}}). Koupit jednu pro každý směr — {{quantity}} × {{perTicket}} Kč = <strong>{{total}} Kč</strong> tam i zpět.",
     "cutoffWarning": "Platí <strong>do 4:00 ráno následujícího dne</strong>, ne celých 24 hodin.",
     "purchase": "Zakupte v aplikaci <link>PID Lítačka</link> nebo na oficiálních místech PID.",
     "noStop": "Zastávka nenalezena. Vraťte se a vyberte cíl."
@@ -43,13 +44,20 @@
     "routeLabel": "Trasa",
     "hikersLabel": "Cestující",
     "regional": "Regionální jízdenka (zóny 1–13)",
+    "pragueAnd14": "Denní jízdenka Praha + zóny 1–4",
     "wholeNetwork": "Celosíťová jízdenka",
     "familyOneAdult": "1 dospělý + max. 2 děti",
-    "familyTwoAdults": "2 dospělí + max. 4 děti"
+    "familyTwoAdults": "2 dospělí + max. 4 děti",
+    "shortTerm": "Jednorázová jízdenka {{zones}} zón"
+  },
+  "praguePass": {
+    "label": "Mám pražské předplatné PID",
+    "help": "Předplatné pro zóny P, 0, B"
   },
   "validity": {
     "day": "24 hodin",
-    "cutoff": "Do 4:00 ráno"
+    "cutoff": "Do 4:00 ráno",
+    "minutes": "{{count}} min"
   },
   "partyLabels": {
     "single": "1 dospělý",
