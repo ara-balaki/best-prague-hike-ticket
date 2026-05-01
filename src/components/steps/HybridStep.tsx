@@ -81,15 +81,30 @@ export function HybridStep({ stops }: HybridStepProps) {
 
   const results = query.length >= 2 ? fuse.search(query, { limit: 10 }) : [];
 
+  const zoneMatch = query.trim().match(/^(?:zone\s*)?(\d+)$/i);
+  const zoneOption = zoneMatch ? parseInt(zoneMatch[1], 10) : null;
+
+  const totalOptions = (zoneOption !== null ? 1 : 0) + results.length;
+
   function pick(stop: IStop) {
     setQuery(stop.name);
     setOpen(false);
     setActiveIndex(-1);
     setValue("stop", stop.name, { shouldValidate: true });
+    setValue("zoneCount", undefined);
     posthog?.capture("stop_selected", {
       stop_name: stop.name,
       transport_filter: transport,
     });
+  }
+
+  function pickZone(zone: number) {
+    setQuery(`Zone ${zone}`);
+    setOpen(false);
+    setActiveIndex(-1);
+    setValue("stop", `Zone ${zone}`, { shouldValidate: true });
+    setValue("zoneCount", zone);
+    posthog?.capture("zone_selected", { zone });
   }
 
   function clear() {
@@ -97,6 +112,7 @@ export function HybridStep({ stops }: HybridStepProps) {
     setOpen(false);
     setActiveIndex(-1);
     setValue("stop", "", { shouldValidate: false });
+    setValue("zoneCount", undefined);
   }
 
   return (
@@ -123,17 +139,23 @@ export function HybridStep({ stops }: HybridStepProps) {
               setValue("stop", "", { shouldValidate: false });
             }}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (!open || results.length === 0) return;
+              if (!open || totalOptions === 0) return;
               if (e.key === "ArrowDown") {
                 e.preventDefault();
-                setActiveIndex((i) => Math.min(i + 1, results.length - 1));
+                setActiveIndex((i) => Math.min(i + 1, totalOptions - 1));
               } else if (e.key === "ArrowUp") {
                 e.preventDefault();
                 setActiveIndex((i) => Math.max(i - 1, 0));
               } else if (e.key === "Enter") {
                 e.preventDefault();
-                const target = results[activeIndex >= 0 ? activeIndex : 0];
-                if (target) pick(target.item);
+                const idx = activeIndex >= 0 ? activeIndex : 0;
+                if (zoneOption !== null && idx === 0) {
+                  pickZone(zoneOption);
+                } else {
+                  const offset = zoneOption !== null ? 1 : 0;
+                  const target = results[idx - offset];
+                  if (target) pick(target.item);
+                }
               } else if (e.key === "Escape") {
                 setOpen(false);
                 setActiveIndex(-1);
@@ -156,9 +178,23 @@ export function HybridStep({ stops }: HybridStepProps) {
           )}
         </div>
 
-        {open && results.length > 0 && (
+        {open && totalOptions > 0 && (
           <ul className="absolute top-full z-10 mt-1 max-h-60 w-full list-none overflow-y-auto rounded-xl border border-forest/20 bg-cream-card p-1 shadow-lg">
+            {zoneOption !== null && (
+              <li
+                onMouseDown={() => pickZone(zoneOption)}
+                onMouseEnter={() => setActiveIndex(0)}
+                className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm ${activeIndex === 0 ? "bg-forest/10" : "hover:bg-forest/10"}`}
+              >
+                <span className="text-black">Zone {zoneOption} — all stops</span>
+                <span className="inline-flex items-center gap-1 rounded-md bg-forest/10 px-1.5 py-0.5 text-xs text-forest">
+                  Zone {zoneOption}
+                </span>
+              </li>
+            )}
             {results.map(({ item }, idx) => {
+              const offset = zoneOption !== null ? 1 : 0;
+              const listIdx = idx + offset;
               const servingModes = activeModes.filter((m) =>
                 isSuburban(item, m),
               );
@@ -166,8 +202,8 @@ export function HybridStep({ stops }: HybridStepProps) {
                 <li
                   key={item.name}
                   onMouseDown={() => pick(item)}
-                  onMouseEnter={() => setActiveIndex(idx)}
-                  className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm ${idx === activeIndex ? "bg-forest/10" : "hover:bg-forest/10"}`}
+                  onMouseEnter={() => setActiveIndex(listIdx)}
+                  className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm ${listIdx === activeIndex ? "bg-forest/10" : "hover:bg-forest/10"}`}
                 >
                   <span className="text-black">{item.name}</span>
                   <div className="flex shrink-0 gap-1">

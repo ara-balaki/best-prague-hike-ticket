@@ -22,7 +22,7 @@ const STEPS: StepConfig[] = [
     label: "Your Trip",
     title: "Prague Hike Ticket Finder",
     description:
-      "Find the best ticket for your hike to suburban stops around Prague",
+      "Find the best ticket for your hike to suburban stops around Prague. Zones are counted from the city centre (P, 0, B).",
     fields: ["stop", "party"],
   },
   {
@@ -58,13 +58,16 @@ function App() {
     const isValid = await form.trigger(step.fields);
     if (!isValid) return;
     if (step.id === "hybrid") {
-      const { stop: stopName, party = "single", transport = "all" } = form.getValues();
-      const stop = stops.find((s) => s.name === stopName);
-      if (stop) {
-        const { count } = getZoneInfo(stop, transport);
+      const { stop: stopName, party = "single", transport = "all", zoneCount } = form.getValues();
+      const count = zoneCount ?? (() => {
+        const stop = stops.find((s) => s.name === stopName);
+        return stop ? getZoneInfo(stop, transport).count : null;
+      })();
+      if (count !== null) {
         const ticket = cheapestTicket(count, party);
         posthog?.capture("ticket_found", {
           stop_name: stopName,
+          zone_count: count,
           party,
           transport_filter: transport,
           ticket_id: ticket.id,
@@ -92,13 +95,16 @@ function App() {
   };
 
   const handlePurchaseLinkClick = () => {
-    const { stop: stopName, party = "single", transport = "all" } = form.getValues();
-    const stop = stops.find((s) => s.name === stopName);
-    if (stop) {
-      const { count } = getZoneInfo(stop, transport);
+    const { stop: stopName, party = "single", transport = "all", zoneCount } = form.getValues();
+    const count = zoneCount ?? (() => {
+      const stop = stops.find((s) => s.name === stopName);
+      return stop ? getZoneInfo(stop, transport).count : null;
+    })();
+    if (count !== null) {
       const ticket = cheapestTicket(count, party);
       posthog?.capture("purchase_link_clicked", {
         stop_name: stopName,
+        zone_count: count,
         party,
         transport_filter: transport,
         ticket_id: ticket.id,

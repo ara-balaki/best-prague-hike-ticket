@@ -54,5 +54,6 @@ export type TransportFilter = Transport | "all";
 export type FormValues = {
   transport?: TransportFilter;
   stop: string;
+  zoneCount?: number;
   party?: Party;
 };

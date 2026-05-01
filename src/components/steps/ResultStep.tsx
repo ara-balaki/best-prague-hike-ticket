@@ -16,13 +16,14 @@ export function ResultStep({ stops }: ResultStepProps) {
   const stopName = useWatch({ control, name: "stop" });
   const transport = useWatch({ control, name: "transport" });
   const party = useWatch({ control, name: "party" }) ?? "single";
+  const zoneCount = useWatch({ control, name: "zoneCount" });
 
   const stop = useMemo(
-    () => stops.find((s) => s.name === stopName),
-    [stops, stopName],
+    () => (zoneCount ? null : stops.find((s) => s.name === stopName)),
+    [stops, stopName, zoneCount],
   );
 
-  if (!stop) {
+  if (!zoneCount && !stop) {
     return (
       <p className="text-center text-sm text-muted">
         No matching stop found. Please go back and pick a destination.
@@ -30,14 +31,15 @@ export function ResultStep({ stops }: ResultStepProps) {
     );
   }
 
-  const { count, label } = getZoneInfo(stop, transport ?? "all");
+  const count = zoneCount ?? getZoneInfo(stop!, transport ?? "all").count;
+  const label = `Zone ${count}`;
+  const routeTo = zoneCount ? `Zone ${zoneCount}` : stop!.name;
   const ticket = cheapestTicket(count, party);
   const partyLabel = PARTY_LABELS[party];
   const isCutoff = ticket.type === "day-cutoff";
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-5">
-      {/* Summary — shown where description would be */}
       <p className="text-center text-base leading-relaxed text-muted text-balance">
         Your best option is the{" "}
         <strong className="text-forest">{ticket.name}</strong> valid for{" "}
@@ -59,7 +61,7 @@ export function ResultStep({ stops }: ResultStepProps) {
         <Ticket
           ticket={ticket}
           routeFrom="Prague"
-          routeTo={stop.name}
+          routeTo={routeTo}
           zoneLabel={label}
           partyLabel={partyLabel}
         />
