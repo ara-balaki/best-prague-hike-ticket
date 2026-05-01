@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
+import { Trans, useTranslation } from "react-i18next";
 
-import { formatValidity } from "../../lib/formaters";
 import { cheapestTicket } from "../../lib/ranking";
 import { getZoneInfo, PARTY_LABELS } from "../../lib/transport";
 import type { FormValues, IStop } from "../../types";
@@ -11,7 +11,14 @@ interface ResultStepProps {
   stops: IStop[];
 }
 
+const PARTY_LABEL_KEYS: Record<keyof typeof PARTY_LABELS, string> = {
+  single: "partyLabels.single",
+  "one-adult-two-children": "partyLabels.oneAdultTwoChildren",
+  "two-adults-two-children": "partyLabels.twoAdultsFourChildren",
+};
+
 export function ResultStep({ stops }: ResultStepProps) {
+  const { t } = useTranslation();
   const { control } = useFormContext<FormValues>();
   const stopName = useWatch({ control, name: "stop" });
   const transport = useWatch({ control, name: "transport" });
@@ -25,9 +32,7 @@ export function ResultStep({ stops }: ResultStepProps) {
 
   if (!zoneCount && !stop) {
     return (
-      <p className="text-center text-sm text-muted">
-        No matching stop found. Please go back and pick a destination.
-      </p>
+      <p className="text-center text-sm text-muted">{t("result.noStop")}</p>
     );
   }
 
@@ -35,24 +40,36 @@ export function ResultStep({ stops }: ResultStepProps) {
   const label = `Zone ${count}`;
   const routeTo = zoneCount ? `Zone ${zoneCount}` : stop!.name;
   const ticket = cheapestTicket(count, party);
-  const partyLabel = PARTY_LABELS[party];
+  const partyLabel = t(PARTY_LABEL_KEYS[party]);
   const isCutoff = ticket.type === "day-cutoff";
+  const validity = t(`validity.${isCutoff ? "cutoff" : "day"}`);
+
+  const ticketNameKey: Record<string, string> = {
+    regional: "ticket.regional",
+    "whole-network": "ticket.wholeNetwork",
+    "family-one-adult": "ticket.familyOneAdult",
+    "family-two-adults": "ticket.familyTwoAdults",
+  };
+  const ticketName = t(ticketNameKey[ticket.id]);
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-5">
       <p className="text-center text-base leading-relaxed text-muted text-balance">
-        Your best option is the{" "}
-        <strong className="text-forest">{ticket.name}</strong> valid for{" "}
-        {formatValidity(ticket.validity, ticket.type)} at{" "}
-        <strong className="text-forest">{ticket.price} Kč</strong>.
+        <Trans
+          i18nKey="result.summary"
+          values={{ ticketName, validity, price: ticket.price }}
+          components={{ strong: <strong className="text-forest" /> }}
+        />
       </p>
 
       {isCutoff && (
         <div className="w-full flex items-start gap-2 rounded-xl border border-amber/60 bg-amber/10 px-4 py-3 text-sm text-forest">
           <span aria-hidden>⏰</span>
           <p>
-            Valid <strong>until 4:00 AM the following day</strong>, not a full
-            24 hours.
+            <Trans
+              i18nKey="result.cutoffWarning"
+              components={{ strong: <strong /> }}
+            />
           </p>
         </div>
       )}

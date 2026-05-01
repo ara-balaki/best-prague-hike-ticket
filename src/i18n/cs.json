@@ -1,0 +1,56 @@
+{
+  "app": {
+    "title": "Hledač jízdenek na výlety z Prahy",
+    "description": "Najděte nejlepší jízdenku pro výlet na příměstské zastávky kolem Prahy. Zóny se počítají od středu města (P, 0, B)."
+  },
+  "destination": {
+    "label": "Cílová zastávka",
+    "placeholder": "např. Karlštejn, Turnov",
+    "clear": "Smazat",
+    "required": "Vyberte cíl",
+    "zoneOption": "Zóna {{zone}} — všechny zastávky"
+  },
+  "party": {
+    "label": "Kdo jede na výlet?",
+    "single": { "title": "1 dospělý", "description": "Jeden dospělý" },
+    "oneAdultTwoChildren": {
+      "title": "Malá skupina",
+      "description": "1 dospělý + max. 2 děti"
+    },
+    "twoAdultsFourChildren": {
+      "title": "Velká skupina",
+      "description": "2 dospělí + max. 4 děti"
+    }
+  },
+  "nav": {
+    "continue": "Pokračovat",
+    "back": "← Zpět",
+    "newSearch": "Nové hledání"
+  },
+  "result": {
+    "summary": "Nejlepší volbou je <strong>{{ticketName}}</strong> – {{validity}} za <strong>{{price}} Kč</strong>.",
+    "cutoffWarning": "Platí <strong>do 4:00 ráno následujícího dne</strong>, ne celých 24 hodin.",
+    "purchase": "Zakupte v aplikaci <link>PID Lítačka</link> nebo na oficiálních místech PID.",
+    "noStop": "Zastávka nenalezena. Vraťte se a vyberte cíl."
+  },
+  "ticket": {
+    "brand": "Pražská integrovaná doprava",
+    "validLabel": "Platnost",
+    "routeLabel": "Trasa",
+    "hikersLabel": "Cestující",
+    "regional": "Regionální jízdenka (zóny 1–13)",
+    "wholeNetwork": "Celosíťová jízdenka",
+    "familyOneAdult": "1 dospělý + max. 2 děti",
+    "familyTwoAdults": "2 dospělí + max. 4 děti"
+  },
+  "validity": {
+    "day": "24 hodin",
+    "cutoff": "Do 4:00 ráno"
+  },
+  "partyLabels": {
+    "single": "1 dospělý",
+    "oneAdultTwoChildren": "1 dospělý + 2 děti",
+    "twoAdultsFourChildren": "2 dospělí + 4 děti"
+  },
+  "footer": "Data pocházejí z <link>pid.cz</link>, platná pro rok 2026."
+}

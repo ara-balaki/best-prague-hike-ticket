@@ -1,6 +1,8 @@
 import { usePostHog } from "@posthog/react";
+import i18n from "i18next";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { Trans, useTranslation } from "react-i18next";
 
 import { HybridStep } from "./components/steps/HybridStep";
 import { ResultStep } from "./components/steps/ResultStep";
@@ -8,32 +10,8 @@ import { cheapestTicket } from "./lib/ranking";
 import { getZoneInfo } from "./lib/transport";
 import type { FormValues, IStop, IStopsData } from "./types";
 
-interface StepConfig {
-  id: "transport" | "destination" | "party" | "hybrid" | "result";
-  label: string;
-  title?: string;
-  description?: string;
-  fields: readonly (keyof FormValues)[];
-}
-
-const STEPS: StepConfig[] = [
-  {
-    id: "hybrid",
-    label: "Your Trip",
-    title: "Prague Hike Ticket Finder",
-    description:
-      "Find the best ticket for your hike to suburban stops around Prague. Zones are counted from the city centre (P, 0, B).",
-    fields: ["stop", "party"],
-  },
-  {
-    id: "result",
-    label: "Ticket",
-    description: "",
-    fields: [],
-  },
-];
-
 function App() {
+  const { t } = useTranslation();
   const [stops, setStops] = useState<IStop[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const posthog = usePostHog();
@@ -52,12 +30,11 @@ function App() {
     },
   });
 
-  const step = STEPS[currentStep];
-
   const goNext = async () => {
-    const isValid = await form.trigger(step.fields);
+    const fields: (keyof FormValues)[] = currentStep === 0 ? ["stop", "party"] : [];
+    const isValid = await form.trigger(fields);
     if (!isValid) return;
-    if (step.id === "hybrid") {
+    if (currentStep === 0) {
       const { stop: stopName, party = "single", transport = "all", zoneCount } = form.getValues();
       const count = zoneCount ?? (() => {
         const stop = stops.find((s) => s.name === stopName);
@@ -76,12 +53,10 @@ function App() {
         });
       }
     }
-    setCurrentStep((s) => Math.min(s + 1, STEPS.length - 1));
+    setCurrentStep((s) => Math.min(s + 1, 1));
   };
 
-  const goBack = () => {
-    setCurrentStep((s) => Math.max(s - 1, 0));
-  };
+  const goBack = () => setCurrentStep((s) => Math.max(s - 1, 0));
 
   const resetWizard = () => {
     const { stop: stopName, party = "single", transport = "all" } = form.getValues();
@@ -114,11 +89,9 @@ function App() {
     }
   };
 
-  const isResult = step.id === "result";
-  const isAutoAdvance = step.id === "transport";
   const stopValue = useWatch({ control: form.control, name: "stop" });
   const partyValue = useWatch({ control: form.control, name: "party" });
-  const canContinue = step.id === "hybrid" ? !!stopValue && !!partyValue : true;
+  const canContinue = currentStep === 0 ? !!stopValue && !!partyValue : true;
 
   return (
     <FormProvider {...form}>
@@ -129,29 +102,27 @@ function App() {
             onSubmit={(e) => e.preventDefault()}
           >
             <div className="flex flex-1 flex-col gap-5">
-              <p className="text-center text-3xl" aria-hidden>
-                ⛰️
-              </p>
-              {step.title && (
+              <div className="relative flex items-center justify-center">
+                <p className="text-3xl" aria-hidden>⛰️</p>
+                <LanguageSwitcher />
+              </div>
+              {currentStep === 0 && (
                 <h1 className="text-center text-2xl font-bold text-forest sm:text-3xl">
-                  {step.title}
+                  {t("app.title")}
                 </h1>
               )}
-              {step.description && (
+              {currentStep === 0 && (
                 <p className="text-center text-base leading-relaxed text-muted">
-                  {step.description}
+                  {t("app.description")}
                 </p>
               )}
-
               <div className="flex flex-1 flex-col">
-                {step.id === "hybrid" && <HybridStep stops={stops} />}
-                {step.id === "result" && <ResultStep stops={stops} />}
+                {currentStep === 0 && <HybridStep stops={stops} />}
+                {currentStep === 1 && <ResultStep stops={stops} />}
               </div>
-
               <div className="mt-auto">
                 <NavButtons
-                  isResult={isResult}
-                  isAutoAdvance={isAutoAdvance}
+                  isResult={currentStep === 1}
                   canContinue={canContinue}
                   showBack={currentStep > 0}
                   onBack={goBack}
@@ -163,16 +134,19 @@ function App() {
             </div>
           </form>
           <p className="text-center text-xs text-muted/60">
-            Data sourced from{" "}
-            <a
-              href="https://pid.cz/en/fares/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-forest"
-            >
-              pid.cz
-            </a>
-            , valid for 2026.
+            <Trans
+              i18nKey="footer"
+              components={{
+                link: (
+                  <a
+                    href="https://pid.cz/en/fares/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-forest"
+                  />
+                ),
+              }}
+            />
           </p>
         </div>
       </div>
@@ -180,9 +154,30 @@ function App() {
   );
 }
 
+function LanguageSwitcher() {
+  const { i18n: inst } = useTranslation();
+  const posthog = usePostHog();
+
+  function toggle() {
+    const next = inst.language === "en" ? "cs" : "en";
+    i18n.changeLanguage(next);
+    localStorage.setItem("lang", next);
+    posthog?.capture("language_changed", { language: next });
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      className="absolute right-0 rounded-lg px-2 py-1 text-xs font-semibold text-muted hover:text-forest"
+    >
+      {inst.language === "en" ? "CS" : "EN"}
+    </button>
+  );
+}
+
 interface NavButtonsProps {
   isResult: boolean;
-  isAutoAdvance: boolean;
   canContinue: boolean;
   showBack: boolean;
   onBack: () => void;
@@ -193,7 +188,6 @@ interface NavButtonsProps {
 
 function NavButtons({
   isResult,
-  isAutoAdvance,
   canContinue,
   showBack,
   onBack,
@@ -201,43 +195,33 @@ function NavButtons({
   onReset,
   onPurchaseLinkClick,
 }: NavButtonsProps) {
+  const { t } = useTranslation();
+
   if (isResult) {
     return (
       <div className="mt-2 flex flex-col gap-3">
         <p className="text-center text-xs text-muted">
-          Purchase via the{" "}
-          <a
-            href="https://pid.cz/en/pid-litacka/"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={onPurchaseLinkClick}
-            className="underline hover:text-forest"
-          >
-            PID Lítačka app
-          </a>{" "}
-          or official PID channels.
+          <Trans
+            i18nKey="result.purchase"
+            components={{
+              link: (
+                <a
+                  href="https://pid.cz/en/pid-litacka/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={onPurchaseLinkClick}
+                  className="underline hover:text-forest"
+                />
+              ),
+            }}
+          />
         </p>
         <button
           type="button"
           onClick={onReset}
           className="flex-1 rounded-xl border cursor-pointer border-forest/30 bg-cream-card py-3 text-sm font-semibold text-forest hover:bg-forest/5"
         >
-          New Search
-        </button>
-      </div>
-    );
-  }
-
-  if (isAutoAdvance) {
-    if (!showBack) return null;
-    return (
-      <div className="mt-2 flex">
-        <button
-          type="button"
-          onClick={onBack}
-          className="flex-1 rounded-xl border cursor-pointer border-forest/30 bg-cream-card py-3 text-sm font-semibold text-forest hover:bg-forest/5"
-        >
-          ← Back
+          {t("nav.newSearch")}
         </button>
       </div>
     );
@@ -251,7 +235,7 @@ function NavButtons({
         disabled={!canContinue}
         className="flex-1 rounded-xl py-3 text-base font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:bg-sage/40 cursor-pointer disabled:text-white/60 bg-forest"
       >
-        Continue
+        {t("nav.continue")}
       </button>
       {showBack && (
         <button
@@ -259,7 +243,7 @@ function NavButtons({
           onClick={onBack}
           className="rounded-xl border border-forest/30 bg-cream-card py-3 px-6 text-sm font-semibold text-forest hover:bg-forest/5"
         >
-          ← Back
+          {t("nav.back")}
         </button>
       )}
     </div>

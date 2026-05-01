@@ -1,4 +1,5 @@
 import "./index.css";
+import "./i18n/index.ts";
 
 import { PostHogProvider } from "@posthog/react";
 import posthog from "posthog-js";

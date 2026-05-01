@@ -5,6 +5,7 @@ import { usePostHog } from "@posthog/react";
 import Fuse from "fuse.js";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
 import {
   isSuburban,
@@ -18,33 +19,18 @@ interface HybridStepProps {
   stops: IStop[];
 }
 
-const PARTY_OPTIONS: {
+const PARTY_OPTION_KEYS: {
   value: Party;
-  title: string;
-  description: string;
+  tKey: string;
   icon: string;
 }[] = [
-  {
-    value: "single",
-    title: "1 Adult",
-    description: "Single adult",
-    icon: "👤",
-  },
-  {
-    value: "one-adult-two-children",
-    title: "Small Group",
-    description: "1 adult + max. 2 children",
-    icon: "👨‍👧‍👦",
-  },
-  {
-    value: "two-adults-two-children",
-    title: "Large Group",
-    description: "2 adults + max. 4 children",
-    icon: "👨‍👩‍👧‍👦",
-  },
+  { value: "single", tKey: "party.single", icon: "👤" },
+  { value: "one-adult-two-children", tKey: "party.oneAdultTwoChildren", icon: "👨‍👧‍👦" },
+  { value: "two-adults-two-children", tKey: "party.twoAdultsFourChildren", icon: "👨‍👩‍👧‍👦" },
 ];
 
 export function HybridStep({ stops }: HybridStepProps) {
+  const { t } = useTranslation();
   const {
     register,
     setValue,
@@ -81,7 +67,7 @@ export function HybridStep({ stops }: HybridStepProps) {
 
   const results = query.length >= 2 ? fuse.search(query, { limit: 10 }) : [];
 
-  const zoneMatch = query.trim().match(/^(?:zone\s*)?(\d+)$/i);
+  const zoneMatch = query.trim().match(/^(?:zone\s*|zóna\s*)?(\d+)$/i);
   const zoneOption = zoneMatch ? parseInt(zoneMatch[1], 10) : null;
 
   const totalOptions = (zoneOption !== null ? 1 : 0) + results.length;
@@ -120,18 +106,18 @@ export function HybridStep({ stops }: HybridStepProps) {
       {/* Destination */}
       <Field.Root className="relative flex flex-col gap-2">
         <Field.Label className="text-sm font-bold text-black">
-          Destination Stop
+          {t("destination.label")}
         </Field.Label>
         <input
           type="hidden"
-          {...register("stop", { required: "Choose a destination" })}
+          {...register("stop", { required: t("destination.required") })}
         />
         <div className="relative">
           <Field.Control
             autoFocus
             type="text"
             value={query}
-            placeholder="e.g., Karlštejn (Zone 4)"
+            placeholder={t("destination.placeholder")}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setQuery(e.target.value);
               setOpen(true);
@@ -164,13 +150,13 @@ export function HybridStep({ stops }: HybridStepProps) {
             onFocus={() => setOpen(true)}
             onBlur={() => setTimeout(() => setOpen(false), 150)}
             autoComplete="off"
-            className="w-full rounded-xl border-2 border-forest/10  bg-transparent px-4 py-3 pr-10 text-base text-black outline-none placeholder:text-muted/60 focus:border-forest"
+            className="w-full rounded-xl border-2 border-forest/10 bg-transparent px-4 py-3 pr-10 text-base text-black outline-none placeholder:text-muted/60 focus:border-forest"
           />
           {query && (
             <button
               type="button"
               onClick={clear}
-              aria-label="Clear"
+              aria-label={t("destination.clear")}
               className="absolute inset-y-0 right-3 flex items-center text-muted hover:text-forest"
             >
               ×
@@ -186,7 +172,9 @@ export function HybridStep({ stops }: HybridStepProps) {
                 onMouseEnter={() => setActiveIndex(0)}
                 className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm ${activeIndex === 0 ? "bg-forest/10" : "hover:bg-forest/10"}`}
               >
-                <span className="text-black">Zone {zoneOption} — all stops</span>
+                <span className="text-black">
+                  {t("destination.zoneOption", { zone: zoneOption })}
+                </span>
                 <span className="inline-flex items-center gap-1 rounded-md bg-forest/10 px-1.5 py-0.5 text-xs text-forest">
                   Zone {zoneOption}
                 </span>
@@ -232,7 +220,7 @@ export function HybridStep({ stops }: HybridStepProps) {
 
       {/* Party */}
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-bold text-black">Who's hiking?</p>
+        <p className="text-sm font-bold text-black">{t("party.label")}</p>
         <RadioGroup
           onValueChange={(v: Party) => {
             setValue("party", v, { shouldValidate: true });
@@ -240,7 +228,7 @@ export function HybridStep({ stops }: HybridStepProps) {
           }}
           className="flex flex-col sm:flex-row gap-2"
         >
-          {PARTY_OPTIONS.map(({ value, title, description, icon }) => (
+          {PARTY_OPTION_KEYS.map(({ value, tKey, icon }) => (
             <Radio.Root
               key={value}
               value={value}
@@ -249,9 +237,11 @@ export function HybridStep({ stops }: HybridStepProps) {
               <span className="shrink-0 text-2xl leading-none">{icon}</span>
               <div className="flex flex-1 flex-col text-left">
                 <span className="text-sm font-semibold text-forest">
-                  {title}
+                  {t(`${tKey}.title`)}
                 </span>
-                <span className="text-xs text-muted">{description}</span>
+                <span className="text-xs text-muted">
+                  {t(`${tKey}.description`)}
+                </span>
               </div>
               <Radio.Indicator className="hidden" />
             </Radio.Root>

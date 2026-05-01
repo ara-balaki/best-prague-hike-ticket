@@ -1,5 +1,6 @@
-import { formatPrice, formatValidity } from "../../lib/formaters";
-import { PARTY_LABELS } from "../../lib/transport";
+import { useTranslation } from "react-i18next";
+
+import { formatPrice } from "../../lib/formaters";
 import type { ITicket } from "../../types";
 
 interface TicketProps {
@@ -18,6 +19,7 @@ interface CardProps {
   routeTo: string;
   zoneLabel: string;
   partyDisplay: string;
+  labels: { valid: string; route: string; hikers: string; brand: string };
 }
 
 function TicketCard({
@@ -28,6 +30,7 @@ function TicketCard({
   routeTo,
   zoneLabel,
   partyDisplay,
+  labels,
 }: CardProps) {
   return (
     <div className="@container relative w-full overflow-hidden rounded-xl bg-ticket aspect-[2.8/1] shadow-sm">
@@ -46,7 +49,7 @@ function TicketCard({
               className="font-semibold uppercase text-forest leading-none"
               style={{ fontSize: "2cqi", letterSpacing: "0.1em" }}
             >
-              Prague Integrated Transport
+              {labels.brand}
             </p>
             <h3
               className="font-bold text-forest leading-tight"
@@ -59,7 +62,7 @@ function TicketCard({
                 className="text-muted leading-none"
                 style={{ fontSize: "2cqi" }}
               >
-                Valid
+                {labels.valid}
               </p>
               <p
                 className="font-medium text-black"
@@ -88,7 +91,7 @@ function TicketCard({
                 className="text-muted leading-none"
                 style={{ fontSize: "2cqi" }}
               >
-                Route
+                {labels.route}
               </p>
               <p
                 className="font-semibold text-black"
@@ -105,7 +108,7 @@ function TicketCard({
                 className="text-muted leading-none"
                 style={{ fontSize: "2cqi" }}
               >
-                Hikers
+                {labels.hikers}
               </p>
               <p
                 className="font-medium text-black"
@@ -129,22 +132,44 @@ export function Ticket({
   zoneLabel,
   partyLabel,
 }: TicketProps) {
-  const { name, type, price, validity, party } = ticket;
-  const partyDisplay = partyLabel ?? PARTY_LABELS[party] ?? party;
+  const { t } = useTranslation();
 
-  const cardProps: CardProps = {
-    name,
-    price: formatPrice(price),
-    validity: formatValidity(validity, type),
-    routeFrom,
-    routeTo,
-    zoneLabel,
-    partyDisplay,
+  const ticketNameKey: Record<string, string> = {
+    regional: "ticket.regional",
+    "whole-network": "ticket.wholeNetwork",
+    "family-one-adult": "ticket.familyOneAdult",
+    "family-two-adults": "ticket.familyTwoAdults",
+  };
+
+  const partyLabelKey: Record<string, string> = {
+    single: "partyLabels.single",
+    "one-adult-two-children": "partyLabels.oneAdultTwoChildren",
+    "two-adults-two-children": "partyLabels.twoAdultsFourChildren",
+  };
+
+  const name = t(ticketNameKey[ticket.id]);
+  const validity = t(`validity.${ticket.type === "day-cutoff" ? "cutoff" : "day"}`);
+  const partyDisplay = partyLabel ?? t(partyLabelKey[ticket.party]);
+
+  const labels = {
+    brand: t("ticket.brand"),
+    valid: t("ticket.validLabel"),
+    route: t("ticket.routeLabel"),
+    hikers: t("ticket.hikersLabel"),
   };
 
   return (
     <div className="@container mx-auto w-full sm:max-w-126 -rotate-2">
-      <TicketCard {...cardProps} />
+      <TicketCard
+        name={name}
+        price={formatPrice(ticket.price)}
+        validity={validity}
+        routeFrom={routeFrom}
+        routeTo={routeTo}
+        zoneLabel={zoneLabel}
+        partyDisplay={partyDisplay}
+        labels={labels}
+      />
     </div>
   );
 }

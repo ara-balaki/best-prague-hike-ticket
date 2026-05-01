@@ -1,0 +1,56 @@
+{
+  "app": {
+    "title": "Prague Hike Ticket Finder",
+    "description": "Find the best ticket for your hike to suburban stops around Prague. Zones are counted from the city centre (P, 0, B)."
+  },
+  "destination": {
+    "label": "Destination Stop",
+    "placeholder": "e.g., Karlštejn, Turnov",
+    "clear": "Clear",
+    "required": "Choose a destination",
+    "zoneOption": "Zone {{zone}} — all stops"
+  },
+  "party": {
+    "label": "Who's hiking?",
+    "single": { "title": "1 Adult", "description": "Single adult" },
+    "oneAdultTwoChildren": {
+      "title": "Small Group",
+      "description": "1 adult + max. 2 children"
+    },
+    "twoAdultsFourChildren": {
+      "title": "Large Group",
+      "description": "2 adults + max. 4 children"
+    }
+  },
+  "nav": {
+    "continue": "Continue",
+    "back": "← Back",
+    "newSearch": "New Search"
+  },
+  "result": {
+    "summary": "Your best option is the <strong>{{ticketName}}</strong> valid for {{validity}} at <strong>{{price}} Kč</strong>.",
+    "cutoffWarning": "Valid <strong>until 4:00 AM the following day</strong>, not a full 24 hours.",
+    "purchase": "Purchase via the <link>PID Lítačka app</link> or official PID channels.",
+    "noStop": "No matching stop found. Please go back and pick a destination."
+  },
+  "ticket": {
+    "brand": "Prague Integrated Transport",
+    "validLabel": "Valid",
+    "routeLabel": "Route",
+    "hikersLabel": "Hikers",
+    "regional": "Regional Ticket (zones 1–13)",
+    "wholeNetwork": "Whole Network Ticket",
+    "familyOneAdult": "1 Adult + max. 2 Children",
+    "familyTwoAdults": "2 Adults + max. 4 Children"
+  },
+  "validity": {
+    "day": "24 hours",
+    "cutoff": "Until 4:00 AM next day"
+  },
+  "partyLabels": {
+    "single": "1 Adult",
+    "oneAdultTwoChildren": "1 Adult + 2 Children",
+    "twoAdultsFourChildren": "2 Adults + 4 Children"
+  },
+  "footer": "Data sourced from <link>pid.cz</link>, valid for 2026."
+}
