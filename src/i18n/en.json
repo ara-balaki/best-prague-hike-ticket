@@ -36,7 +36,8 @@
     "summaryShortTerm": "Your best option is the <strong>{{ticketName}}</strong> ({{validity}}). Buy one for each direction — {{quantity}} × {{perTicket}} Kč = <strong>{{total}} Kč</strong> round trip.",
     "cutoffWarning": "Valid <strong>until 4:00 AM the following day</strong>, not a full 24 hours.",
     "purchase": "Purchase via the <link>PID Lítačka app</link> or official PID channels.",
-    "noStop": "No matching stop found. Please go back and pick a destination."
+    "noStop": "No matching stop found. Please go back and pick a destination.",
+    "journeyEstimate": "~{{minutes}} min from Praha hl.n. (estimated)"
   },
   "ticket": {
     "brand": "Prague Integrated Transport",

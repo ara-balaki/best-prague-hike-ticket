@@ -36,7 +36,8 @@
     "summaryShortTerm": "Nejlepší volbou je <strong>{{ticketName}}</strong> ({{validity}}). Koupit jednu pro každý směr — {{quantity}} × {{perTicket}} Kč = <strong>{{total}} Kč</strong> tam i zpět.",
     "cutoffWarning": "Platí <strong>do 4:00 ráno následujícího dne</strong>, ne celých 24 hodin.",
     "purchase": "Zakupte v aplikaci <link>PID Lítačka</link> nebo na oficiálních místech PID.",
-    "noStop": "Zastávka nenalezena. Vraťte se a vyberte cíl."
+    "noStop": "Zastávka nenalezena. Vraťte se a vyberte cíl.",
+    "journeyEstimate": "~{{minutes}} min z Praha hl.n. (odhad)"
   },
   "ticket": {
     "brand": "Pražská integrovaná doprava",

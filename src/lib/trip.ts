@@ -1,5 +1,4 @@
 import type { FormValues, IStop, Party, TransportFilter } from "../types";
-
 import { highestZone } from "./zones";
 
 /**
@@ -22,8 +21,13 @@ export interface Trip {
 /**
  * Resolve form values + the loaded stop catalogue into a Trip.
  * Returns null when the form doesn't yet describe a complete trip.
+ * Pass journeyMinutesOverride to substitute the API-derived duration for the static GTFS value.
  */
-export function resolveTrip(values: FormValues, stops: IStop[]): Trip | null {
+export function resolveTrip(
+  values: FormValues,
+  stops: IStop[],
+  journeyMinutesOverride?: number,
+): Trip | null {
   const {
     stop: stopName,
     party = "single",
@@ -52,7 +56,7 @@ export function resolveTrip(values: FormValues, stops: IStop[]): Trip | null {
     outerZone: highestZone(stop, transport),
     party,
     hasPraguePass,
-    journeyMinutes: stop.journeyMinutes,
+    journeyMinutes: journeyMinutesOverride ?? stop.journeyMinutes,
     stopName,
     transport,
   };

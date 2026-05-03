@@ -12,6 +12,10 @@ export interface IStop {
   zones: Partial<Record<Transport, string[]>>;
   /** Shortest direct-trip time from the journey hub (Praha hl.n.). */
   journeyMinutes?: number;
+  /** WGS-84 latitude, averaged across all platforms with this name. */
+  lat?: number;
+  /** WGS-84 longitude, averaged across all platforms with this name. */
+  lon?: number;
 }
 
 export interface IStopsData {

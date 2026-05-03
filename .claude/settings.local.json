@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unzip -o /tmp/PID_GTFS_gen/PID_GTFS.zip -d /tmp/PID_GTFS_gen/extracted routes.txt route_stops.txt)",
+      "Bash(node *)"
+    ]
+  }
+}

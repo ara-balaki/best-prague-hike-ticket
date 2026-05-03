@@ -1,6 +1,8 @@
+import { useEffect, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { Trans, useTranslation } from "react-i18next";
 
+import { fetchJourneyMinutes } from "../../lib/itinerary";
 import { cheapestTicket } from "../../lib/ranking";
 import {
   partyLabel as partyDisplayLabel,
@@ -11,6 +13,8 @@ import { resolveTrip } from "../../lib/trip";
 import type { FormValues, IStop } from "../../types";
 import { Ticket } from "../ui/Ticket";
 
+const JOURNEY_HUB = "Praha hl.n.";
+
 interface ResultStepProps {
   stops: IStop[];
 }
@@ -18,10 +22,58 @@ interface ResultStepProps {
 export function ResultStep({ stops }: ResultStepProps) {
   const { t } = useTranslation();
   const { control } = useFormContext<FormValues>();
-  // Watch the whole form so the recommendation rerenders on any change.
   const values = useWatch({ control });
 
-  const trip = resolveTrip(values as FormValues, stops);
+  // undefined = fetching, null = no result (fallback to static), number = API result
+  const [apiJourneyMinutes, setApiJourneyMinutes] = useState<
+    number | null | undefined
+  >(undefined);
+
+  const stopName = values.stop;
+  const zoneCount = values.zoneCount;
+
+  const dest = stopName ? stops.find((s) => s.name === stopName) : undefined;
+  const hub = stops.find((s) => s.name === JOURNEY_HUB);
+  const shouldFetch =
+    zoneCount === undefined &&
+    !!stopName &&
+    !!(dest?.lat && dest?.lon && hub?.lat && hub?.lon);
+
+  useEffect(() => {
+    if (!shouldFetch) return;
+
+    const dest = stops.find((s) => s.name === stopName);
+    const hub = stops.find((s) => s.name === JOURNEY_HUB);
+    if (!dest?.lat || !dest?.lon || !hub?.lat || !hub?.lon) return;
+
+    let cancelled = false;
+
+    fetchJourneyMinutes(
+      { name: hub.name, lat: hub.lat, lon: hub.lon },
+      { name: dest.name, lat: dest.lat, lon: dest.lon },
+    ).then((minutes) => {
+      if (!cancelled) setApiJourneyMinutes(minutes);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [shouldFetch, stopName, stops]);
+
+  if (shouldFetch && apiJourneyMinutes === undefined) {
+    return (
+      <div className="flex flex-1 items-center justify-center py-8">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-forest/20 border-t-forest" />
+      </div>
+    );
+  }
+
+  const trip = resolveTrip(
+    values as FormValues,
+    stops,
+    apiJourneyMinutes ?? undefined,
+  );
+
   if (!trip) {
     return (
       <p className="text-center text-sm text-muted">{t("result.noStop")}</p>
@@ -45,7 +97,7 @@ export function ResultStep({ stops }: ResultStepProps) {
           <Trans
             i18nKey="result.summaryShortTerm"
             values={{
-              ticketName,
+              ticketName: ticketLabel,
               validity,
               perTicket: ticket.price,
               quantity,
@@ -61,6 +113,12 @@ export function ResultStep({ stops }: ResultStepProps) {
           />
         )}
       </p>
+
+      {trip.journeyMinutes !== undefined && (
+        <p className="text-center text-sm text-muted">
+          {t("result.journeyEstimate", { minutes: trip.journeyMinutes })}
+        </p>
+      )}
 
       {isCutoff && (
         <div className="w-full flex items-start gap-2 rounded-xl border border-amber/60 bg-amber/10 px-4 py-3 text-sm text-forest">

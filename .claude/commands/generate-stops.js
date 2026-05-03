@@ -102,7 +102,7 @@ async function main() {
     console.log(`Reusing extracted data in ${EXTRACTED_DIR}`);
   }
 
-  // 1. stops.txt → Map<stop_id, {name, zoneId}>
+  // 1. stops.txt → Map<stop_id, {name, zoneId, lat, lon}>
   console.log('Parsing stops.txt...');
   const stopById = new Map();
   await readCSV(`${EXTRACTED_DIR}/stops.txt`, (row) => {
@@ -110,7 +110,12 @@ async function main() {
     if (row.stop_id.startsWith('T')) return;
     // Skip parent stations / entrances (location_type 1, 2, 3, 4); keep 0 and blank
     if (row.location_type !== '' && row.location_type !== '0') return;
-    stopById.set(row.stop_id, { name: row.stop_name, zoneId: row.zone_id || '-' });
+    stopById.set(row.stop_id, {
+      name: row.stop_name,
+      zoneId: row.zone_id || '-',
+      lat: parseFloat(row.stop_lat),
+      lon: parseFloat(row.stop_lon),
+    });
   });
   console.log(`  ${stopById.size} stops`);
 
@@ -134,11 +139,12 @@ async function main() {
   });
   console.log(`  ${modesByStop.size} stops assigned to routes`);
 
-  // 4. Merge by name → Map<name, Map<mode, Set<zoneId>>>
+  // 4. Merge by name → Map<name, Map<mode, Set<zoneId>>> + lat/lon accumulator
   //    Skip zone_id "-" — stops explicitly marked as outside the PID fare zone system.
   console.log('Building stop name → zones-by-mode map...');
   const byName = new Map();
-  for (const [stopId, { name, zoneId }] of stopById) {
+  const latLonByName = new Map(); // name → { latSum, lonSum, count }
+  for (const [stopId, { name, zoneId, lat, lon }] of stopById) {
     if (zoneId === '-') continue; // no fare zone — unusable for ticket calculation
     const modes = modesByStop.get(stopId);
     if (!modes) continue; // stop exists in stops.txt but no active route serves it
@@ -147,6 +153,11 @@ async function main() {
     for (const mode of modes) {
       if (!modeMap.has(mode)) modeMap.set(mode, new Set());
       modeMap.get(mode).add(zoneId);
+    }
+    if (!isNaN(lat) && !isNaN(lon)) {
+      if (!latLonByName.has(name)) latLonByName.set(name, { latSum: 0, lonSum: 0, count: 0 });
+      const ll = latLonByName.get(name);
+      ll.latSum += lat; ll.lonSum += lon; ll.count++;
     }
   }
 
@@ -160,7 +171,13 @@ async function main() {
       if (validZones.length > 0) zones[mode] = validZones;
     }
     if (Object.keys(zones).length === 0) continue; // skip fully-unzoned stops
-    stops.push({ name, searchKey: normalizeSearch(name), zones });
+    const entry = { name, searchKey: normalizeSearch(name), zones };
+    const ll = latLonByName.get(name);
+    if (ll && ll.count > 0) {
+      entry.lat = Math.round(ll.latSum / ll.count * 1e6) / 1e6;
+      entry.lon = Math.round(ll.lonSum / ll.count * 1e6) / 1e6;
+    }
+    stops.push(entry);
   }
   stops.sort((a, b) => a.name.localeCompare(b.name, 'cs'));
 
