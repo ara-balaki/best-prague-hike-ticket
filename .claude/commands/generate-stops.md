@@ -57,11 +57,11 @@ node .claude/commands/generate-stops.js --no-download --tmp-dir /tmp/PID_GTFS_ge
 
 ## GTFS route_type → mode mapping
 
-| GTFS route_type | Mode |
-|---|---|
-| 0, 900–999 | tram |
-| 1, 400–499 | metro |
-| 2, 100–199 | train |
-| 3, 700–799 | bus |
-| 4 | ferry |
-| 11, 800–899 | trolleybus |
+| GTFS route_type | Mode       |
+| --------------- | ---------- |
+| 0, 900–999      | tram       |
+| 1, 400–499      | metro      |
+| 2, 100–199      | train      |
+| 3, 700–799      | bus        |
+| 4               | ferry      |
+| 11, 800–899     | trolleybus |

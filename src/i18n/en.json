@@ -7,6 +7,12 @@
     "title": "Prague Hike Ticket Finder",
     "description": "Find the best ticket for your hike to suburban stops around Prague. Zones are counted from the city centre (P, 0, B)."
   },
+  "from": {
+    "label": "Starting Point",
+    "placeholder": "e.g., Praha hl.n., Smíchovské nádraží",
+    "required": "Choose a starting point",
+    "zoneOption": "Zone {{zone}} — all stops"
+  },
   "destination": {
     "label": "Destination Stop",
     "placeholder": "e.g., Karlštejn, Turnov",

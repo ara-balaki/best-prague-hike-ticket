@@ -1,5 +1,5 @@
-import type { FormValues, IStop, Party, TransportFilter } from "../types";
-import { highestZone } from "./zones";
+import type { FormValues, Party, Stop, TransportFilter } from '../types'
+import { highestZone } from './zones'
 
 /**
  * The user's intent, resolved from form values + stop catalogue.
@@ -8,14 +8,14 @@ import { highestZone } from "./zones";
  */
 export interface Trip {
   /** Highest outer zone of the destination (1-13). */
-  outerZone: number;
-  party: Party;
-  hasPraguePass: boolean;
+  outerZone: number
+  party: Party
+  hasPraguePass: boolean
   /** Shortest direct one-way journey time from Praha hl.n., in minutes. */
-  journeyMinutes?: number;
+  journeyMinutes?: number
   /** Original stop name (or "Zone N" sentinel for the zone shortcut). */
-  stopName: string;
-  transport: TransportFilter;
+  stopName: string
+  transport: TransportFilter
 }
 
 /**
@@ -25,18 +25,18 @@ export interface Trip {
  */
 export function resolveTrip(
   values: FormValues,
-  stops: IStop[],
-  journeyMinutesOverride?: number,
+  stops: Stop[],
+  journeyMinutesOverride?: number
 ): Trip | null {
   const {
-    stop: stopName,
-    party = "single",
-    transport = "all",
+    to: stopName,
+    party = 'single',
+    transportFilter: transport = 'all',
     zoneCount,
     hasPraguePass = false,
-  } = values;
+  } = values
 
-  if (!stopName) return null;
+  if (!stopName) return null
 
   // Zone shortcut: user typed "zone 4" — bypass stop lookup entirely.
   if (zoneCount !== undefined) {
@@ -46,11 +46,11 @@ export function resolveTrip(
       hasPraguePass,
       stopName,
       transport,
-    };
+    }
   }
 
-  const stop = stops.find((s) => s.name === stopName);
-  if (!stop) return null;
+  const stop = stops.find((s) => s.name === stopName)
+  if (!stop) return null
 
   return {
     outerZone: highestZone(stop, transport),
@@ -59,5 +59,5 @@ export function resolveTrip(
     journeyMinutes: journeyMinutesOverride ?? stop.journeyMinutes,
     stopName,
     transport,
-  };
+  }
 }

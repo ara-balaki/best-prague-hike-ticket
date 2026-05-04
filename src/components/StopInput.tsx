@@ -74,7 +74,7 @@ export function StopInput({ stops, name, label }: StopInputProps) {
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value)
-    field.onChange(e)
+    field.onChange('')
     setOpen(true)
     setActiveIndex(-1)
   }
@@ -117,7 +117,6 @@ export function StopInput({ stops, name, label }: StopInputProps) {
       <Field.Label className="text-sm font-bold text-black">
         {label}
       </Field.Label>
-
       <div className="relative">
         <Field.Control
           autoFocus
@@ -175,8 +174,8 @@ export function StopInput({ stops, name, label }: StopInputProps) {
         </ul>
       )}
 
-      {errors.stop && (
-        <p className="text-sm text-red-600">{errors.stop.message}</p>
+      {errors[field.name] && (
+        <p className="text-sm text-red-600">{errors[field.name]?.message}</p>
       )}
     </Field.Root>
   )

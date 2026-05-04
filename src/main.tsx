@@ -1,22 +1,22 @@
-import "./index.css";
-import "./i18n/index.ts";
+import './index.css'
+import './i18n/index.ts'
 
-import { PostHogProvider } from "@posthog/react";
-import posthog from "posthog-js";
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { PostHogProvider } from '@posthog/react'
+import posthog from 'posthog-js'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
 
-import App from "./App.tsx";
+import App from './App.tsx'
 
 posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_TOKEN, {
   api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-  defaults: "2026-01-30",
-});
+  defaults: '2026-01-30',
+})
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <PostHogProvider client={posthog}>
       <App />
     </PostHogProvider>
-  </StrictMode>,
-);
+  </StrictMode>
+)

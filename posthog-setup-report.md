@@ -3,13 +3,13 @@
 
 The wizard has completed a deep integration of PostHog analytics into the Prague Hike Ticket Finder app. PostHog is initialized in `src/main.tsx` using environment variables, with the `PostHogProvider` wrapping the entire app. Five custom events are tracked at key user actions across the search and result flow — covering destination selection, party choice, ticket discovery, and purchase intent.
 
-| Event | Description | File |
-|---|---|---|
-| `stop_selected` | User picks a destination stop from the autocomplete dropdown | `src/components/steps/HybridStep.tsx` |
-| `party_selected` | User selects a party type (single, small group, large group) | `src/components/steps/HybridStep.tsx` |
-| `ticket_found` | User submits the form and sees their recommended ticket — the main conversion event | `src/App.tsx` |
-| `purchase_link_clicked` | User clicks the PID Lítačka link to purchase the recommended ticket | `src/App.tsx` |
-| `new_search_started` | User resets the wizard and starts a new search after seeing a result | `src/App.tsx` |
+| Event                   | Description                                                                         | File                                  |
+| ----------------------- | ----------------------------------------------------------------------------------- | ------------------------------------- |
+| `stop_selected`         | User picks a destination stop from the autocomplete dropdown                        | `src/components/steps/HybridStep.tsx` |
+| `party_selected`        | User selects a party type (single, small group, large group)                        | `src/components/steps/HybridStep.tsx` |
+| `ticket_found`          | User submits the form and sees their recommended ticket — the main conversion event | `src/App.tsx`                         |
+| `purchase_link_clicked` | User clicks the PID Lítačka link to purchase the recommended ticket                 | `src/App.tsx`                         |
+| `new_search_started`    | User resets the wizard and starts a new search after seeing a result                | `src/App.tsx`                         |
 
 ## Next steps
 

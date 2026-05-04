@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-cream: #fbf6e4;
@@ -11,8 +11,9 @@
   --color-ticket: #faefcb;
   --color-muted: #6b6663;
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
 }
 
 html,
@@ -30,6 +31,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6, p, li, span, label, a, dt, dd {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+li,
+span,
+label,
+a,
+dt,
+dd {
   text-wrap: balance;
 }

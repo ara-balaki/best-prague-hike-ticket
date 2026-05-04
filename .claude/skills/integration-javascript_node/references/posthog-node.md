@@ -30,7 +30,7 @@ PostHog Node.js SDK allows you to capture events and send them to PostHog from y
 
 ```node
 // Generated example for getLibraryId
-posthog.getLibraryId();
+posthog.getLibraryId()
 ```
 
 ---
@@ -56,7 +56,7 @@ Must be called in the same async scope that makes PostHog calls. Calling this ou
 
 ```node
 // Generated example for enterContext
-posthog.enterContext();
+posthog.enterContext()
 ```
 
 ---
@@ -73,7 +73,7 @@ posthog.enterContext();
 
 ```node
 // Generated example for flush
-posthog.flush();
+posthog.flush()
 ```
 
 ---
@@ -89,17 +89,17 @@ posthog.flush();
 ### Returns
 
 - `Promise<{
-        distinctId: string;
-        event: string;
-        properties: PostHogEventProperties;
-        options: PostHogCaptureOptions;
-    }>`
+      distinctId: string;
+      event: string;
+      properties: PostHogEventProperties;
+      options: PostHogCaptureOptions;
+  }>`
 
 ### Examples
 
 ```node
 // Generated example for prepareEventMessage
-posthog.prepareEventMessage();
+posthog.prepareEventMessage()
 ```
 
 ---
@@ -121,7 +121,7 @@ posthog.prepareEventMessage();
 
 ```node
 // Generated example for fetch
-posthog.fetch();
+posthog.fetch()
 ```
 
 ---
@@ -130,7 +130,7 @@ posthog.fetch();
 
 **Release Tag:** public
 
-* ** SURVEYS *
+- \*_ SURVEYS _
 
 ### Returns
 
@@ -140,7 +140,7 @@ posthog.fetch();
 
 ```node
 // Generated example for getSurveysStateless
-posthog.getSurveysStateless();
+posthog.getSurveysStateless()
 ```
 
 ---
@@ -162,7 +162,7 @@ posthog.getSurveysStateless();
 
 ```node
 // Generated example for on
-posthog.on();
+posthog.on()
 ```
 
 ---
@@ -179,7 +179,7 @@ posthog.on();
 
 ```node
 // Generated example for optIn
-posthog.optIn();
+posthog.optIn()
 ```
 
 ---
@@ -196,7 +196,7 @@ posthog.optIn();
 
 ```node
 // Generated example for optOut
-posthog.optOut();
+posthog.optOut()
 ```
 
 ---
@@ -217,7 +217,7 @@ posthog.optOut();
 
 ```node
 // Generated example for register
-posthog.register();
+posthog.register()
 ```
 
 ---
@@ -238,7 +238,7 @@ posthog.register();
 
 ```node
 // Generated example for unregister
-posthog.unregister();
+posthog.unregister()
 ```
 
 ---
@@ -266,23 +266,19 @@ Initialize a new PostHog client instance.
 
 ```node
 // Basic initialization
-const client = new PostHogBackendClient(
-  'your-api-key',
-  { host: 'https://app.posthog.com' }
-)
+const client = new PostHogBackendClient('your-api-key', {
+  host: 'https://app.posthog.com',
+})
 ```
 
 #### With personal API key
 
 ```node
 // With personal API key
-const client = new PostHogBackendClient(
-  'your-api-key',
-  {
-    host: 'https://app.posthog.com',
-    personalApiKey: 'your-personal-api-key'
-  }
-)
+const client = new PostHogBackendClient('your-api-key', {
+  host: 'https://app.posthog.com',
+  personalApiKey: 'your-personal-api-key',
+})
 ```
 
 ---
@@ -352,6 +348,7 @@ Get a persisted property value from memory storage.
 ### Returns
 
 **Union of:**
+
 - `any`
 - `undefined`
 
@@ -444,10 +441,10 @@ Create an alias to link two distinct IDs together.
 ### Parameters
 
 - **`data`** (`{
-        distinctId: string;
-        alias: string;
-        disableGeoip?: boolean;
-    }`) - The alias data containing distinctId and alias
+      distinctId: string;
+      alias: string;
+      disableGeoip?: boolean;
+  }`) - The alias data containing distinctId and alias
 
 ### Returns
 
@@ -459,7 +456,7 @@ Create an alias to link two distinct IDs together.
 // Link an anonymous user to an identified user
 client.alias({
   distinctId: 'anonymous_123',
-  alias: 'user_456'
+  alias: 'user_456',
 })
 ```
 
@@ -474,10 +471,10 @@ Create an alias to link two distinct IDs together immediately (synchronously).
 ### Parameters
 
 - **`data`** (`{
-        distinctId: string;
-        alias: string;
-        disableGeoip?: boolean;
-    }`) - The alias data containing distinctId and alias
+      distinctId: string;
+      alias: string;
+      disableGeoip?: boolean;
+  }`) - The alias data containing distinctId and alias
 
 ### Returns
 
@@ -489,7 +486,7 @@ Create an alias to link two distinct IDs together immediately (synchronously).
 // Link an anonymous user to an identified user immediately
 await client.aliasImmediate({
   distinctId: 'anonymous_123',
-  alias: 'user_456'
+  alias: 'user_456',
 })
 ```
 
@@ -541,9 +538,9 @@ client.groupIdentify({
   properties: {
     name: 'Acme Corporation',
     industry: 'Technology',
-    employee_count: 500
+    employee_count: 500,
   },
-  distinctId: 'user_123'
+  distinctId: 'user_123',
 })
 ```
 
@@ -556,8 +553,8 @@ client.groupIdentify({
   groupKey: 'org-456',
   properties: {
     plan: 'enterprise',
-    region: 'US-West'
-  }
+    region: 'US-West',
+  },
 })
 ```
 
@@ -588,8 +585,8 @@ client.identify({
   properties: {
     name: 'John Doe',
     email: 'john@example.com',
-    plan: 'premium'
-  }
+    plan: 'premium',
+  },
 })
 ```
 
@@ -631,8 +628,8 @@ await client.identifyImmediate({
   distinctId: 'user_123',
   properties: {
     name: 'John Doe',
-    email: 'john@example.com'
-  }
+    email: 'john@example.com',
+  },
 })
 ```
 
@@ -661,7 +658,7 @@ Capture an event manually.
 client.capture({
   distinctId: 'user_123',
   event: 'button_clicked',
-  properties: { button_color: 'red' }
+  properties: { button_color: 'red' },
 })
 ```
 
@@ -690,7 +687,7 @@ Capture an event immediately (synchronously).
 await client.captureImmediate({
   distinctId: 'user_123',
   event: 'button_clicked',
-  properties: { button_color: 'red' }
+  properties: { button_color: 'red' },
 })
 ```
 
@@ -701,7 +698,7 @@ await client.captureImmediate({
 await client.captureImmediate({
   distinctId: 'user_123',
   event: 'user_action',
-  sendFeatureFlags: true
+  sendFeatureFlags: true,
 })
 ```
 
@@ -766,7 +763,7 @@ try {
   client.captureException(error, 'user_123', {
     endpoint: '/api/users',
     method: 'POST',
-    status_code: 500
+    status_code: 500,
   })
 }
 ```
@@ -813,7 +810,7 @@ try {
   await client.captureExceptionImmediate(error, 'user_123', {
     endpoint: '/api/users',
     method: 'POST',
-    status_code: 500
+    status_code: 500,
   })
 }
 ```
@@ -894,7 +891,7 @@ console.log('User flags:', allFlags)
 ```node
 // With specific flag keys
 const specificFlags = await client.getAllFlags('user_123', {
-  flagKeys: ['flag-1', 'flag-2']
+  flagKeys: ['flag-1', 'flag-2'],
 })
 ```
 
@@ -904,7 +901,7 @@ const specificFlags = await client.getAllFlags('user_123', {
 // With groups and properties
 const orgFlags = await client.getAllFlags('user_123', {
   groups: { organization: 'acme-corp' },
-  personProperties: { plan: 'enterprise' }
+  personProperties: { plan: 'enterprise' },
 })
 ```
 
@@ -940,7 +937,7 @@ console.log('Payloads:', result.featureFlagPayloads)
 ```node
 // With specific flag keys
 const result = await client.getAllFlagsAndPayloads('user_123', {
-  flagKeys: ['flag-1', 'flag-2']
+  flagKeys: ['flag-1', 'flag-2'],
 })
 ```
 
@@ -949,7 +946,7 @@ const result = await client.getAllFlagsAndPayloads('user_123', {
 ```node
 // Only evaluate locally
 const result = await client.getAllFlagsAndPayloads('user_123', {
-  onlyEvaluateLocally: true
+  onlyEvaluateLocally: true,
 })
 ```
 
@@ -966,17 +963,18 @@ Get the value of a feature flag for a specific user.
 - **`key`** (`string`) - The feature flag key
 - **`distinctId`** (`string`) - The user's distinct ID
 - **`options?`** (`{
-        groups?: Record<string, string>;
-        personProperties?: Record<string, string>;
-        groupProperties?: Record<string, Record<string, string>>;
-        onlyEvaluateLocally?: boolean;
-        sendFeatureFlagEvents?: boolean;
-        disableGeoip?: boolean;
-    }`) - Optional configuration for flag evaluation
+      groups?: Record<string, string>;
+      personProperties?: Record<string, string>;
+      groupProperties?: Record<string, Record<string, string>>;
+      onlyEvaluateLocally?: boolean;
+      sendFeatureFlagEvents?: boolean;
+      disableGeoip?: boolean;
+  }`) - Optional configuration for flag evaluation
 
 ### Returns
 
 **Union of:**
+
 - `Promise<FeatureFlagValue`
 - `undefined>`
 
@@ -1003,7 +1001,7 @@ if (flagValue === 'variant-a') {
 const flagValue = await client.getFeatureFlag('org-feature', 'user_123', {
   groups: { organization: 'acme-corp' },
   personProperties: { plan: 'enterprise' },
-  groupProperties: { organization: { tier: 'premium' } }
+  groupProperties: { organization: { tier: 'premium' } },
 })
 ```
 
@@ -1012,7 +1010,7 @@ const flagValue = await client.getFeatureFlag('org-feature', 'user_123', {
 ```node
 // Only evaluate locally
 const flagValue = await client.getFeatureFlag('local-flag', 'user_123', {
-  onlyEvaluateLocally: true
+  onlyEvaluateLocally: true,
 })
 ```
 
@@ -1030,17 +1028,18 @@ Get the payload for a feature flag.
 - **`distinctId`** (`string`) - The user's distinct ID
 - **`matchValue?`** (`FeatureFlagValue`) - Optional match value to get payload for
 - **`options?`** (`{
-        groups?: Record<string, string>;
-        personProperties?: Record<string, string>;
-        groupProperties?: Record<string, Record<string, string>>;
-        onlyEvaluateLocally?: boolean;
-        sendFeatureFlagEvents?: boolean;
-        disableGeoip?: boolean;
-    }`) - Optional configuration for flag evaluation
+      groups?: Record<string, string>;
+      personProperties?: Record<string, string>;
+      groupProperties?: Record<string, Record<string, string>>;
+      onlyEvaluateLocally?: boolean;
+      sendFeatureFlagEvents?: boolean;
+      disableGeoip?: boolean;
+  }`) - Optional configuration for flag evaluation
 
 ### Returns
 
 **Union of:**
+
 - `Promise<JsonType`
 - `undefined>`
 
@@ -1060,17 +1059,26 @@ if (payload) {
 
 ```node
 // Get payload with specific match value
-const payload = await client.getFeatureFlagPayload('flag-key', 'user_123', 'variant-a')
+const payload = await client.getFeatureFlagPayload(
+  'flag-key',
+  'user_123',
+  'variant-a'
+)
 ```
 
 #### With groups and properties
 
 ```node
 // With groups and properties
-const payload = await client.getFeatureFlagPayload('org-flag', 'user_123', undefined, {
-  groups: { organization: 'acme-corp' },
-  personProperties: { plan: 'enterprise' }
-})
+const payload = await client.getFeatureFlagPayload(
+  'org-flag',
+  'user_123',
+  undefined,
+  {
+    groups: { organization: 'acme-corp' },
+    personProperties: { plan: 'enterprise' },
+  }
+)
 ```
 
 ---
@@ -1089,6 +1097,7 @@ Get the result of evaluating a feature flag, including its value and payload. Th
 ### Returns
 
 **Union of:**
+
 - `Promise<FeatureFlagResult`
 - `undefined>`
 
@@ -1112,7 +1121,7 @@ if (result) {
 // With groups and properties
 const result = await client.getFeatureFlagResult('org-feature', 'user_123', {
   groups: { organization: 'acme-corp' },
-  personProperties: { plan: 'enterprise' }
+  personProperties: { plan: 'enterprise' },
 })
 ```
 
@@ -1131,6 +1140,7 @@ Get the remote config payload for a feature flag.
 ### Returns
 
 **Union of:**
+
 - `Promise<JsonType`
 - `undefined>`
 
@@ -1157,17 +1167,18 @@ Check if a feature flag is enabled for a specific user.
 - **`key`** (`string`) - The feature flag key
 - **`distinctId`** (`string`) - The user's distinct ID
 - **`options?`** (`{
-        groups?: Record<string, string>;
-        personProperties?: Record<string, string>;
-        groupProperties?: Record<string, Record<string, string>>;
-        onlyEvaluateLocally?: boolean;
-        sendFeatureFlagEvents?: boolean;
-        disableGeoip?: boolean;
-    }`) - Optional configuration for flag evaluation
+      groups?: Record<string, string>;
+      personProperties?: Record<string, string>;
+      groupProperties?: Record<string, Record<string, string>>;
+      onlyEvaluateLocally?: boolean;
+      sendFeatureFlagEvents?: boolean;
+      disableGeoip?: boolean;
+  }`) - Optional configuration for flag evaluation
 
 ### Returns
 
 **Union of:**
+
 - `Promise<boolean`
 - `undefined>`
 
@@ -1193,7 +1204,7 @@ if (isEnabled) {
 // With groups and properties
 const isEnabled = await client.isFeatureEnabled('org-feature', 'user_123', {
   groups: { organization: 'acme-corp' },
-  personProperties: { plan: 'enterprise' }
+  personProperties: { plan: 'enterprise' },
 })
 ```
 
@@ -1253,7 +1264,7 @@ client.overrideFeatureFlags({ 'my-flag': 'variant-a', 'other-flag': true })
 // Set both flags and payloads
 client.overrideFeatureFlags({
   flags: { 'my-flag': 'variant-a' },
-  payloads: { 'my-flag': { discount: 20 } }
+  payloads: { 'my-flag': { discount: 20 } },
 })
 ```
 
@@ -1337,6 +1348,7 @@ Get the current context data.
 ### Returns
 
 **Union of:**
+
 - `ContextData`
 - `undefined`
 

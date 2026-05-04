@@ -1,114 +1,122 @@
-import { Field } from "@base-ui/react/field";
-import { Radio } from "@base-ui/react/radio";
-import { RadioGroup } from "@base-ui/react/radio-group";
-import Fuse from "fuse.js";
-import { useState } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { Field } from '@base-ui/react/field'
+import { Radio } from '@base-ui/react/radio'
+import { RadioGroup } from '@base-ui/react/radio-group'
+import Fuse from 'fuse.js'
+import { useState } from 'react'
+import { useFormContext, useWatch } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 
-import { useAnalytics } from "../../lib/analytics";
-import { isSuburban, SUBURBAN_MODES } from "../../lib/zones";
-import type { FormValues, IStop, Party, Transport } from "../../types";
+import { useAnalytics } from '../../lib/analytics'
+import { isSuburban, SUBURBAN_MODES } from '../../lib/zones'
+import type { FormValues, Party, Stop, Transport } from '../../types'
 
 const MODE_LABEL: Record<Transport, string> = {
-  bus: "Bus",
-  ferry: "Ferry",
-  metro: "Metro",
-  train: "Train",
-  tram: "Tram",
-  trolleybus: "Trolleybus",
-};
+  bus: 'Bus',
+  ferry: 'Ferry',
+  metro: 'Metro',
+  train: 'Train',
+  tram: 'Tram',
+  trolleybus: 'Trolleybus',
+}
 
 const MODE_EMOJI: Record<Transport, string> = {
-  bus: "🚌",
-  ferry: "⛴️",
-  metro: "🚇",
-  train: "🚆",
-  tram: "🚊",
-  trolleybus: "🚎",
-};
+  bus: '🚌',
+  ferry: '⛴️',
+  metro: '🚇',
+  train: '🚆',
+  tram: '🚊',
+  trolleybus: '🚎',
+}
 
 interface HybridStepProps {
-  stops: IStop[];
+  stops: Stop[]
 }
 
 const PARTY_OPTION_KEYS: {
-  value: Party;
-  tKey: string;
-  icon: string;
+  value: Party
+  tKey: string
+  icon: string
 }[] = [
-  { value: "single", tKey: "party.single", icon: "👤" },
-  { value: "one-adult-two-children", tKey: "party.oneAdultTwoChildren", icon: "👨‍👧‍👦" },
-  { value: "two-adults-two-children", tKey: "party.twoAdultsFourChildren", icon: "👨‍👩‍👧‍👦" },
-];
+  { value: 'single', tKey: 'party.single', icon: '👤' },
+  {
+    value: 'one-adult-two-children',
+    tKey: 'party.oneAdultTwoChildren',
+    icon: '👨‍👧‍👦',
+  },
+  {
+    value: 'two-adults-two-children',
+    tKey: 'party.twoAdultsFourChildren',
+    icon: '👨‍👩‍👧‍👦',
+  },
+]
 
 export function HybridStep({ stops }: HybridStepProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   const {
     register,
     setValue,
     control,
     formState: { errors },
-  } = useFormContext<FormValues>();
+  } = useFormContext<FormValues>()
 
-  const stopValue = useWatch({ control, name: "stop" });
-  const transport = useWatch({ control, name: "transport" }) ?? "all";
-  const analytics = useAnalytics();
+  const stopValue = useWatch({ control, name: 'stop' })
+  const transport = useWatch({ control, name: 'transport' }) ?? 'all'
+  const analytics = useAnalytics()
 
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState(() => stopValue ?? "");
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState(() => stopValue ?? '')
+  const [activeIndex, setActiveIndex] = useState(-1)
 
   const activeModes =
-    transport === "all"
+    transport === 'all'
       ? SUBURBAN_MODES
-      : SUBURBAN_MODES.filter((m) => m === transport);
+      : SUBURBAN_MODES.filter((m) => m === transport)
 
   const suburbanStops = stops.filter((s) =>
-    activeModes.some((m) => isSuburban(s, m)),
-  );
+    activeModes.some((m) => isSuburban(s, m))
+  )
 
   const fuse = new Fuse(suburbanStops, {
     keys: [
-      { name: "searchKey", weight: 1 },
-      { name: "name", weight: 0.5 },
+      { name: 'searchKey', weight: 1 },
+      { name: 'name', weight: 0.5 },
     ],
     threshold: 0.35,
     distance: 80,
     minMatchCharLength: 2,
-  });
+  })
 
-  const results = query.length >= 2 ? fuse.search(query, { limit: 10 }) : [];
+  const results = query.length >= 2 ? fuse.search(query, { limit: 10 }) : []
 
-  const zoneMatch = query.trim().match(/^(?:zone\s*|zóna\s*)?(\d+)$/i);
-  const zoneOption = zoneMatch ? parseInt(zoneMatch[1], 10) : null;
+  const zoneMatch = query.trim().match(/^(?:zone\s*|zóna\s*)?(\d+)$/i)
+  const zoneOption = zoneMatch ? parseInt(zoneMatch[1], 10) : null
 
-  const totalOptions = (zoneOption !== null ? 1 : 0) + results.length;
+  const totalOptions = (zoneOption !== null ? 1 : 0) + results.length
 
-  function pick(stop: IStop) {
-    setQuery(stop.name);
-    setOpen(false);
-    setActiveIndex(-1);
-    setValue("stop", stop.name, { shouldValidate: true });
-    setValue("zoneCount", undefined);
-    analytics.stopSelected(stop.name, transport);
+  function pick(stop: Stop) {
+    setQuery(stop.name)
+    setOpen(false)
+    setActiveIndex(-1)
+    setValue('stop', stop.name, { shouldValidate: true })
+    setValue('zoneCount', undefined)
+    analytics.stopSelected(stop.name, transport)
   }
 
   function pickZone(zone: number) {
-    setQuery(`Zone ${zone}`);
-    setOpen(false);
-    setActiveIndex(-1);
-    setValue("stop", `Zone ${zone}`, { shouldValidate: true });
-    setValue("zoneCount", zone);
-    analytics.zoneSelected(zone);
+    setQuery(`Zone ${zone}`)
+    setOpen(false)
+    setActiveIndex(-1)
+    setValue('stop', `Zone ${zone}`, { shouldValidate: true })
+    setValue('zoneCount', zone)
+    analytics.zoneSelected(zone)
   }
 
   function clear() {
-    setQuery("");
-    setOpen(false);
-    setActiveIndex(-1);
-    setValue("stop", "", { shouldValidate: false });
-    setValue("zoneCount", undefined);
+    setQuery('')
+    setOpen(false)
+    setActiveIndex(-1)
+    setValue('stop', '', { shouldValidate: false })
+    setValue('zoneCount', undefined)
   }
 
   return (
@@ -116,45 +124,45 @@ export function HybridStep({ stops }: HybridStepProps) {
       {/* Destination */}
       <Field.Root className="relative flex flex-col gap-2">
         <Field.Label className="text-sm font-bold text-black">
-          {t("destination.label")}
+          {t('destination.label')}
         </Field.Label>
         <input
           type="hidden"
-          {...register("stop", { required: t("destination.required") })}
+          {...register('stop', { required: t('destination.required') })}
         />
         <div className="relative">
           <Field.Control
             autoFocus
             type="text"
             value={query}
-            placeholder={t("destination.placeholder")}
+            placeholder={t('destination.placeholder')}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setQuery(e.target.value);
-              setOpen(true);
-              setActiveIndex(-1);
-              setValue("stop", "", { shouldValidate: false });
+              setQuery(e.target.value)
+              setOpen(true)
+              setActiveIndex(-1)
+              setValue('stop', '', { shouldValidate: false })
             }}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (!open || totalOptions === 0) return;
-              if (e.key === "ArrowDown") {
-                e.preventDefault();
-                setActiveIndex((i) => Math.min(i + 1, totalOptions - 1));
-              } else if (e.key === "ArrowUp") {
-                e.preventDefault();
-                setActiveIndex((i) => Math.max(i - 1, 0));
-              } else if (e.key === "Enter") {
-                e.preventDefault();
-                const idx = activeIndex >= 0 ? activeIndex : 0;
+              if (!open || totalOptions === 0) return
+              if (e.key === 'ArrowDown') {
+                e.preventDefault()
+                setActiveIndex((i) => Math.min(i + 1, totalOptions - 1))
+              } else if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                setActiveIndex((i) => Math.max(i - 1, 0))
+              } else if (e.key === 'Enter') {
+                e.preventDefault()
+                const idx = activeIndex >= 0 ? activeIndex : 0
                 if (zoneOption !== null && idx === 0) {
-                  pickZone(zoneOption);
+                  pickZone(zoneOption)
                 } else {
-                  const offset = zoneOption !== null ? 1 : 0;
-                  const target = results[idx - offset];
-                  if (target) pick(target.item);
+                  const offset = zoneOption !== null ? 1 : 0
+                  const target = results[idx - offset]
+                  if (target) pick(target.item)
                 }
-              } else if (e.key === "Escape") {
-                setOpen(false);
-                setActiveIndex(-1);
+              } else if (e.key === 'Escape') {
+                setOpen(false)
+                setActiveIndex(-1)
               }
             }}
             onFocus={() => setOpen(true)}
@@ -166,7 +174,7 @@ export function HybridStep({ stops }: HybridStepProps) {
             <button
               type="button"
               onClick={clear}
-              aria-label={t("destination.clear")}
+              aria-label={t('destination.clear')}
               className="absolute inset-y-0 right-3 flex items-center text-muted hover:text-forest"
             >
               ×
@@ -180,10 +188,10 @@ export function HybridStep({ stops }: HybridStepProps) {
               <li
                 onMouseDown={() => pickZone(zoneOption)}
                 onMouseEnter={() => setActiveIndex(0)}
-                className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm ${activeIndex === 0 ? "bg-forest/10" : "hover:bg-forest/10"}`}
+                className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm ${activeIndex === 0 ? 'bg-forest/10' : 'hover:bg-forest/10'}`}
               >
                 <span className="text-black">
-                  {t("destination.zoneOption", { zone: zoneOption })}
+                  {t('destination.zoneOption', { zone: zoneOption })}
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-md bg-forest/10 px-1.5 py-0.5 text-xs text-forest">
                   Zone {zoneOption}
@@ -191,17 +199,17 @@ export function HybridStep({ stops }: HybridStepProps) {
               </li>
             )}
             {results.map(({ item }, idx) => {
-              const offset = zoneOption !== null ? 1 : 0;
-              const listIdx = idx + offset;
+              const offset = zoneOption !== null ? 1 : 0
+              const listIdx = idx + offset
               const servingModes = activeModes.filter((m) =>
-                isSuburban(item, m),
-              );
+                isSuburban(item, m)
+              )
               return (
                 <li
                   key={item.name}
                   onMouseDown={() => pick(item)}
                   onMouseEnter={() => setActiveIndex(listIdx)}
-                  className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm ${listIdx === activeIndex ? "bg-forest/10" : "hover:bg-forest/10"}`}
+                  className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm ${listIdx === activeIndex ? 'bg-forest/10' : 'hover:bg-forest/10'}`}
                 >
                   <span className="text-black">{item.name}</span>
                   <div className="flex shrink-0 gap-1">
@@ -213,12 +221,12 @@ export function HybridStep({ stops }: HybridStepProps) {
                       >
                         <span aria-hidden>{MODE_EMOJI[m]}</span>
                         <span className="sr-only">{MODE_LABEL[m]}</span>
-                        Zone {item.zones[m]!.join(", ")}
+                        Zone {item.zones[m]!.join(', ')}
                       </span>
                     ))}
                   </div>
                 </li>
-              );
+              )
             })}
           </ul>
         )}
@@ -230,11 +238,11 @@ export function HybridStep({ stops }: HybridStepProps) {
 
       {/* Party */}
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-bold text-black">{t("party.label")}</p>
+        <p className="text-sm font-bold text-black">{t('party.label')}</p>
         <RadioGroup
           onValueChange={(v: Party) => {
-            setValue("party", v, { shouldValidate: true });
-            analytics.partySelected(v);
+            setValue('party', v, { shouldValidate: true })
+            analytics.partySelected(v)
           }}
           className="flex flex-col sm:flex-row gap-2"
         >
@@ -263,18 +271,18 @@ export function HybridStep({ stops }: HybridStepProps) {
       <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 bg-cream-card px-3 py-3 hover:border-forest/30 hover:bg-forest/5">
         <input
           type="checkbox"
-          {...register("hasPraguePass", {
+          {...register('hasPraguePass', {
             onChange: (e) => analytics.praguePassToggled(e.target.checked),
           })}
           className="mt-0.5 size-4 cursor-pointer accent-forest"
         />
         <div className="flex flex-1 flex-col text-left">
           <span className="text-sm font-semibold text-forest">
-            {t("praguePass.label")}
+            {t('praguePass.label')}
           </span>
-          <span className="text-xs text-muted">{t("praguePass.help")}</span>
+          <span className="text-xs text-muted">{t('praguePass.help')}</span>
         </div>
       </label>
     </div>
-  );
+  )
 }

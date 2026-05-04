@@ -8,11 +8,11 @@ This guide walks you through an example integration of PostHog using vanilla Rea
 
 Using React with a framework like Next.js, Remix, or React Router requires additional setup. Follow their respective guides instead:
 
--   [![](https://res.cloudinary.com/dmukukwp6/image/upload/posthog.com/contents/images/docs/integrate/frameworks/nextjs.svg)Next.js](/docs/libraries/next-js.md)
+- [![](https://res.cloudinary.com/dmukukwp6/image/upload/posthog.com/contents/images/docs/integrate/frameworks/nextjs.svg)Next.js](/docs/libraries/next-js.md)
 
--   [![](https://res.cloudinary.com/dmukukwp6/image/upload/remix_letter_glowing_49183adce2.svg)Remix](/docs/libraries/remix.md)
+- [![](https://res.cloudinary.com/dmukukwp6/image/upload/remix_letter_glowing_49183adce2.svg)Remix](/docs/libraries/remix.md)
 
--   [![](https://res.cloudinary.com/dmukukwp6/image/upload/rr_logo_light_970950178e.svg)React Router](/docs/libraries/react-router.md)
+- [![](https://res.cloudinary.com/dmukukwp6/image/upload/rr_logo_light_970950178e.svg)React Router](/docs/libraries/react-router.md)
 
 ## Beta: integration via LLM
 
@@ -79,18 +79,18 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-import posthog from 'posthog-js';
+import posthog from 'posthog-js'
 import { PostHogProvider } from '@posthog/react'
 posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_TOKEN, {
   api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
   defaults: '2026-01-30',
-});
+})
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <PostHogProvider client={posthog}>
       <App />
     </PostHogProvider>
-  </StrictMode>,
+  </StrictMode>
 )
 ```
 
@@ -118,20 +118,20 @@ PostHog AI
 
 ```jsx
 // src/index.js
-import posthog from 'posthog-js';
-import { PostHogProvider} from '@posthog/react'
+import posthog from 'posthog-js'
+import { PostHogProvider } from '@posthog/react'
 posthog.init(process.env.REACT_APP_PUBLIC_POSTHOG_TOKEN, {
   api_host: process.env.REACT_APP_PUBLIC_POSTHOG_HOST,
   defaults: '2026-01-30',
-});
-const root = ReactDOM.createRoot(document.getElementById('root'));
+})
+const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
     <PostHogProvider client={posthog}>
       <App />
     </PostHogProvider>
   </React.StrictMode>
-);
+)
 ```
 
 ### Calling PostHog methods
@@ -155,34 +155,36 @@ import { usePostHog } from '@posthog/react'
 import { useEffect } from 'react'
 import { useUser, useLogin } from '../lib/user'
 function App() {
-    // `usePostHog`, like other React contexts, must be called at the top level of your component
-    const posthog = usePostHog()
-    const login = useLogin()
-    const user = useUser()
-    useEffect(() => {
-        if (user) {
-            // Identify sends an event, so you may want to limit how often you call it
-            posthog?.identify(user.id, {
-                email: user.email,
-            })
-            posthog?.group('company', user.company_id)
-        }
-    }, [posthog, user.id, user.email, user.company_id])
-    const loginClicked = () => {
-        posthog?.capture('clicked_log_in')
-        login()
+  // `usePostHog`, like other React contexts, must be called at the top level of your component
+  const posthog = usePostHog()
+  const login = useLogin()
+  const user = useUser()
+  useEffect(() => {
+    if (user) {
+      // Identify sends an event, so you may want to limit how often you call it
+      posthog?.identify(user.id, {
+        email: user.email,
+      })
+      posthog?.group('company', user.company_id)
     }
-    return (
-        <div className="App">
-            {/* Fire a custom event when the button is clicked */}
-            <button onClick={() => posthog?.capture('button_clicked')}>Click me</button>
-            {/* This button click event is autocaptured by default */}
-            <button data-attr="autocapture-button">Autocapture buttons</button>
-            {/* This button click event is not autocaptured */}
-            <button className="ph-no-capture">Ignore certain elements</button>
-            <button onClick={loginClicked}>Login</button>
-        </div>
-    )
+  }, [posthog, user.id, user.email, user.company_id])
+  const loginClicked = () => {
+    posthog?.capture('clicked_log_in')
+    login()
+  }
+  return (
+    <div className="App">
+      {/* Fire a custom event when the button is clicked */}
+      <button onClick={() => posthog?.capture('button_clicked')}>
+        Click me
+      </button>
+      {/* This button click event is autocaptured by default */}
+      <button data-attr="autocapture-button">Autocapture buttons</button>
+      {/* This button click event is not autocaptured */}
+      <button className="ph-no-capture">Ignore certain elements</button>
+      <button onClick={loginClicked}>Login</button>
+    </div>
+  )
 }
 export default App
 ```
@@ -223,11 +225,11 @@ PostHog AI
 ```jsx
 import { PostHogCaptureOnViewed } from '@posthog/react'
 function App() {
-    return (
-        <PostHogCaptureOnViewed name="hero-banner">
-            <div>Your important content here</div>
-        </PostHogCaptureOnViewed>
-    )
+  return (
+    <PostHogCaptureOnViewed name="hero-banner">
+      <div>Your important content here</div>
+    </PostHogCaptureOnViewed>
+  )
 }
 ```
 
@@ -241,14 +243,14 @@ PostHog AI
 
 ```jsx
 <PostHogCaptureOnViewed
-    name="product-card"
-    properties={{
-        product_id: '123',
-        category: 'electronics',
-        price: 299.99
-    }}
+  name="product-card"
+  properties={{
+    product_id: '123',
+    category: 'electronics',
+    price: 299.99,
+  }}
 >
-    <ProductCard />
+  <ProductCard />
 </PostHogCaptureOnViewed>
 ```
 
@@ -262,13 +264,13 @@ PostHog AI
 
 ```jsx
 <PostHogCaptureOnViewed
-    name="product-gallery"
-    properties={{ gallery_type: 'featured' }}
-    trackAllChildren
+  name="product-gallery"
+  properties={{ gallery_type: 'featured' }}
+  trackAllChildren
 >
-    <ProductCard id="1" />
-    <ProductCard id="2" />
-    <ProductCard id="3" />
+  <ProductCard id="1" />
+  <ProductCard id="2" />
+  <ProductCard id="3" />
 </PostHogCaptureOnViewed>
 ```
 
@@ -284,13 +286,13 @@ PostHog AI
 
 ```jsx
 <PostHogCaptureOnViewed
-    name="footer"
-    observerOptions={{
-        threshold: 0.5,  // Element is 50% visible
-        rootMargin: '0px'
-    }}
+  name="footer"
+  observerOptions={{
+    threshold: 0.5, // Element is 50% visible
+    rootMargin: '0px',
+  }}
 >
-    <Footer />
+  <Footer />
 </PostHogCaptureOnViewed>
 ```
 
@@ -309,12 +311,12 @@ There are two ways to implement feature flags in React:
 
 PostHog provides several hooks to make it easy to use feature flags in your React app.
 
-| Hook | Description |
-| --- | --- |
-| useFeatureFlagEnabled | Returns a boolean indicating whether the feature flag is enabled. This sends a $feature_flag_called event. |
-| useFeatureFlagVariantKey | Returns the variant key of the feature flag. This sends a $feature_flag_called event. |
-| useActiveFeatureFlags | Returns an array of active feature flags. This does not send a $feature_flag_called event. |
-| useFeatureFlagPayload | Returns the payload of the feature flag. This does not send a $feature_flag_called event. Always use this with useFeatureFlagEnabled or useFeatureFlagVariantKey. |
+| Hook                     | Description                                                                                                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| useFeatureFlagEnabled    | Returns a boolean indicating whether the feature flag is enabled. This sends a $feature_flag_called event.                                                        |
+| useFeatureFlagVariantKey | Returns the variant key of the feature flag. This sends a $feature_flag_called event.                                                                             |
+| useActiveFeatureFlags    | Returns an array of active feature flags. This does not send a $feature_flag_called event.                                                                        |
+| useFeatureFlagPayload    | Returns the payload of the feature flag. This does not send a $feature_flag_called event. Always use this with useFeatureFlagEnabled or useFeatureFlagVariantKey. |
 
 #### Example 1: Using a boolean feature flag
 
@@ -329,23 +331,21 @@ function App() {
   const payload = useFeatureFlagPayload('flag-key')
   return (
     <div className="App">
-      {
-        showWelcomeMessage ? (
-          <div>
-            <h1>Welcome!</h1>
-            <p>Thanks for trying out our feature flags.</p>
-          </div>
-        ) : (
-          <div>
-            <h2>No welcome message</h2>
-            <p>Because the feature flag evaluated to false.</p>
-          </div>
-        )
-      }
+      {showWelcomeMessage ? (
+        <div>
+          <h1>Welcome!</h1>
+          <p>Thanks for trying out our feature flags.</p>
+        </div>
+      ) : (
+        <div>
+          <h2>No welcome message</h2>
+          <p>Because the feature flag evaluated to false.</p>
+        </div>
+      )}
     </div>
-  );
+  )
 }
-export default App;
+export default App
 ```
 
 #### Example 2: Using a multivariate feature flag
@@ -366,30 +366,28 @@ function App() {
   }
   return (
     <div className="App">
-      {
-        welcomeMessage ? (
-          <div>
-            <h1>{welcomeMessage}</h1>
-            <p>Thanks for trying out our feature flags.</p>
-          </div>
-        ) : (
-          <div>
-            <h2>No welcome message</h2>
-            <p>Because the feature flag evaluated to false.</p>
-          </div>
-        )
-      }
+      {welcomeMessage ? (
+        <div>
+          <h1>{welcomeMessage}</h1>
+          <p>Thanks for trying out our feature flags.</p>
+        </div>
+      ) : (
+        <div>
+          <h2>No welcome message</h2>
+          <p>Because the feature flag evaluated to false.</p>
+        </div>
+      )}
     </div>
-  );
+  )
 }
-export default App;
+export default App
 ```
 
 #### Example 3: Using a flag payload
 
 **Payload hook**
 
-The `useFeatureFlagPayload` hook does *not* send a [`$feature_flag_called`](https://posthog.com/docs/experiments/new-experimentation-engine#experiment-exposure) event, which is required for the experiment to be tracked. To ensure the exposure event is sent, you should **always** use the `useFeatureFlagPayload` hook with either the `useFeatureFlagEnabled` or `useFeatureFlagVariantKey` hook.
+The `useFeatureFlagPayload` hook does _not_ send a [`$feature_flag_called`](https://posthog.com/docs/experiments/new-experimentation-engine#experiment-exposure) event, which is required for the experiment to be tracked. To ensure the exposure event is sent, you should **always** use the `useFeatureFlagPayload` hook with either the `useFeatureFlagEnabled` or `useFeatureFlagVariantKey` hook.
 
 React
 
@@ -400,21 +398,21 @@ import { useFeatureFlagPayload } from '@posthog/react'
 function App() {
   const variant = useFeatureFlagEnabled('show-welcome-message')
   const payload = useFeatureFlagPayload('show-welcome-message')
-    return (
-                <>
-                {
-                    variant ? (
-                        <div className="welcome-message">
-                            <h2>{payload?.welcomeTitle}</h2>
-                            <p>{payload?.welcomeMessage}</p>
-                        </div>
-                    ) : <div>
-                        <h2>No custom welcome message</h2>
-                        <p>Because the feature flag evaluated to false.</p>
-                    </div>
-                }
-        </>
-    )
+  return (
+    <>
+      {variant ? (
+        <div className="welcome-message">
+          <h2>{payload?.welcomeTitle}</h2>
+          <p>{payload?.welcomeMessage}</p>
+        </div>
+      ) : (
+        <div>
+          <h2>No custom welcome message</h2>
+          <p>Because the feature flag evaluated to false.</p>
+        </div>
+      )}
+    </>
+  )
 }
 ```
 
@@ -435,20 +433,20 @@ PostHog AI
 ```jsx
 import { PostHogFeature } from '@posthog/react'
 function App() {
-    return (
-        <PostHogFeature flag='show-welcome-message' match={true}>
-            <div>
-                <h1>Hello</h1>
-                <p>Thanks for trying out our feature flags.</p>
-            </div>
-        </PostHogFeature>
-    )
+  return (
+    <PostHogFeature flag="show-welcome-message" match={true}>
+      <div>
+        <h1>Hello</h1>
+        <p>Thanks for trying out our feature flags.</p>
+      </div>
+    </PostHogFeature>
+  )
 }
 ```
 
--   The `match` on the component can be either `true`, or the variant key, to match on a specific variant.
+- The `match` on the component can be either `true`, or the variant key, to match on a specific variant.
 
--   If you also want to show a default message, you can pass these in the `fallback` attribute.
+- If you also want to show a default message, you can pass these in the `fallback` attribute.
 
 If you wish to customise logic around when the component is considered visible, you can pass in `visibilityObserverOptions` to the feature. These take the same options as the [IntersectionObserver API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API). By default, we use a threshold of 0.1.
 
@@ -463,18 +461,18 @@ PostHog AI
 ```jsx
 import { PostHogFeature } from '@posthog/react'
 function App() {
-    return (
-        <PostHogFeature flag='show-welcome-message' match={true}>
-           {(payload) => {
-                return (
-                    <div>
-                        <h1>{payload.welcomeMessage}</h1>
-                        <p>Thanks for trying out our feature flags.</p>
-                    </div>
-                )
-           }}
-        </PostHogFeature>
-    )
+  return (
+    <PostHogFeature flag="show-welcome-message" match={true}>
+      {(payload) => {
+        return (
+          <div>
+            <h1>{payload.welcomeMessage}</h1>
+            <p>Thanks for trying out our feature flags.</p>
+          </div>
+        )
+      }}
+    </PostHogFeature>
+  )
 }
 ```
 
@@ -505,29 +503,31 @@ PostHog AI
 
 ```javascript
 function handleFeatureFlag(client, flagKey, distinctId) {
-    try {
-        const isEnabled = client.isFeatureEnabled(flagKey, distinctId);
-        console.log(`Feature flag '${flagKey}' for user '${distinctId}' is ${isEnabled ? 'enabled' : 'disabled'}`);
-        return isEnabled;
-    } catch (error) {
-        console.error(`Error fetching feature flag '${flagKey}': ${error.message}`);
-        // Optionally, you can return a default value or throw the error
-        // return false; // Default to disabled
-        throw error;
-    }
+  try {
+    const isEnabled = client.isFeatureEnabled(flagKey, distinctId)
+    console.log(
+      `Feature flag '${flagKey}' for user '${distinctId}' is ${isEnabled ? 'enabled' : 'disabled'}`
+    )
+    return isEnabled
+  } catch (error) {
+    console.error(`Error fetching feature flag '${flagKey}': ${error.message}`)
+    // Optionally, you can return a default value or throw the error
+    // return false; // Default to disabled
+    throw error
+  }
 }
 // Usage example
 try {
-    const flagEnabled = handleFeatureFlag(client, 'new-feature', 'user-123');
-    if (flagEnabled) {
-        // Implement new feature logic
-    } else {
-        // Implement old feature logic
-    }
+  const flagEnabled = handleFeatureFlag(client, 'new-feature', 'user-123')
+  if (flagEnabled) {
+    // Implement new feature logic
+  } else {
+    // Implement old feature logic
+  }
 } catch (error) {
-    // Handle the error at a higher level
-    console.error('Feature flag check failed, using default behavior');
-    // Implement fallback logic
+  // Handle the error at a higher level
+  console.error('Feature flag check failed, using default behavior')
+  // Implement fallback logic
 }
 ```
 

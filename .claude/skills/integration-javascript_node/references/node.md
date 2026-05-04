@@ -40,10 +40,9 @@ PostHog AI
 
 ```javascript
 import { PostHog } from 'posthog-node'
-const client = new PostHog(
-    '<ph_project_token>',
-    { host: 'https://us.i.posthog.com' }
-)
+const client = new PostHog('<ph_project_token>', {
+  host: 'https://us.i.posthog.com',
+})
 await client.shutdown()
 ```
 
@@ -59,17 +58,17 @@ You can find your project token and instance address in the [project settings](h
 
 ### Options
 
-| Variable | Description | Default value |
-| --- | --- | --- |
-| host | Your PostHog host | https://us.i.posthog.com/ |
-| flushAt | After how many capture calls we should flush the queue (in one batch) | 20 |
-| flushInterval | After how many ms we should flush the queue | 10000 |
-| personalApiKey | An optional [personal API key](/docs/api/overview.md#personal-api-keys-recommended) for evaluating feature flags locally. Note: Providing this will trigger periodic calls to the feature flags service, even if you're not using feature flags. | null |
-| featureFlagsPollingInterval | Interval in milliseconds specifying how often feature flags should be fetched from the PostHog API | 300000 |
-| requestTimeout | Timeout in milliseconds for any calls | 10000 |
-| maxCacheSize | Maximum size of cache that deduplicates $feature_flag_called calls per user. | 50000 |
-| disableGeoip | When true, disables automatic GeoIP resolution for events and feature flags. | true |
-| evaluation_contexts | Evaluation context tags that constrain which feature flags are evaluated. When set, only flags with matching evaluation context tags (or no evaluation context tags) will be returned. This helps reduce unnecessary flag evaluations and improves performance. See [evaluation contexts documentation](/docs/feature-flags/evaluation-contexts.md) for more details. Available in version 5.10.0+. The legacy parameter evaluation_environments (version 5.9.6+) is also supported for backward compatibility. | undefined |
+| Variable                    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Default value             |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| host                        | Your PostHog host                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | https://us.i.posthog.com/ |
+| flushAt                     | After how many capture calls we should flush the queue (in one batch)                                                                                                                                                                                                                                                                                                                                                                                                                                           | 20                        |
+| flushInterval               | After how many ms we should flush the queue                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | 10000                     |
+| personalApiKey              | An optional [personal API key](/docs/api/overview.md#personal-api-keys-recommended) for evaluating feature flags locally. Note: Providing this will trigger periodic calls to the feature flags service, even if you're not using feature flags.                                                                                                                                                                                                                                                                | null                      |
+| featureFlagsPollingInterval | Interval in milliseconds specifying how often feature flags should be fetched from the PostHog API                                                                                                                                                                                                                                                                                                                                                                                                              | 300000                    |
+| requestTimeout              | Timeout in milliseconds for any calls                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | 10000                     |
+| maxCacheSize                | Maximum size of cache that deduplicates $feature_flag_called calls per user.                                                                                                                                                                                                                                                                                                                                                                                                                                    | 50000                     |
+| disableGeoip                | When true, disables automatic GeoIP resolution for events and feature flags.                                                                                                                                                                                                                                                                                                                                                                                                                                    | true                      |
+| evaluation_contexts         | Evaluation context tags that constrain which feature flags are evaluated. When set, only flags with matching evaluation context tags (or no evaluation context tags) will be returned. This helps reduce unnecessary flag evaluations and improves performance. See [evaluation contexts documentation](/docs/feature-flags/evaluation-contexts.md) for more details. Available in version 5.10.0+. The legacy parameter evaluation_environments (version 5.9.6+) is also supported for backward compatibility. | undefined                 |
 
 > **Note:** When using PostHog in an AWS Lambda function or a similar serverless function environment, make sure you set `flushAt` to `1` and `flushInterval` to `0`. Also, remember to always call `await posthog.shutdown()` at the end to flush and send all pending events.
 
@@ -83,8 +82,8 @@ PostHog AI
 
 ```javascript
 client.capture({
-    distinctId: 'distinct_id_of_the_user',
-    event: 'user signed up',
+  distinctId: 'distinct_id_of_the_user',
+  event: 'user signed up',
 })
 ```
 
@@ -140,7 +139,7 @@ client.capture({
   distinctId: 'distinct_id_of_the_user',
   event: 'movie_played',
   properties: {
-    $set: { name: 'Max Hedgehog'  },
+    $set: { name: 'Max Hedgehog' },
     $set_once: { initial_url: '/blog' },
   },
 })
@@ -253,7 +252,7 @@ PostHog AI
 posthog.withContext(
   {
     distinctId: 'user-123',
-    properties: { transactionId: 'abc123' }
+    properties: { transactionId: 'abc123' },
   },
   () => {
     // This event is captured with the distinct ID and properties set above
@@ -275,12 +274,9 @@ function someFunction() {
   posthog.capture({ event: 'order_processed' })
 }
 function outerFunction() {
-  posthog.withContext(
-    { properties: { transactionId: 'abc123' } },
-    () => {
-      someFunction()
-    }
-  )
+  posthog.withContext({ properties: { transactionId: 'abc123' } }, () => {
+    someFunction()
+  })
 }
 ```
 
@@ -295,17 +291,14 @@ posthog.withContext(
   {
     properties: {
       someKey: 'value-1',
-      someOtherKey: 'another-value'
-    }
+      someOtherKey: 'another-value',
+    },
   },
   () => {
-    posthog.withContext(
-      { properties: { someKey: 'value-2' } },
-      () => {
-        // Captured with someKey='value-2', someOtherKey='another-value'
-        posthog.capture({ event: 'order_processed' })
-      },
-    )
+    posthog.withContext({ properties: { someKey: 'value-2' } }, () => {
+      // Captured with someKey='value-2', someOtherKey='another-value'
+      posthog.capture({ event: 'order_processed' })
+    })
     // Captured with someKey='value-1', someOtherKey='another-value'
     posthog.capture({ event: 'order_completed' })
   }
@@ -323,18 +316,15 @@ Node.js
 PostHog AI
 
 ```javascript
-posthog.withContext(
-  { distinctId: 'user-123' },
-  () => {
-    // Associated with "user-123"
-    posthog.capture({ event: 'order_processed' })
-    // Overrides to "another-user"
-    posthog.capture({
-      distinctId: 'another-user',
-      event: 'order_processed'
-    })
-  }
-)
+posthog.withContext({ distinctId: 'user-123' }, () => {
+  // Associated with "user-123"
+  posthog.capture({ event: 'order_processed' })
+  // Overrides to "another-user"
+  posthog.capture({
+    distinctId: 'another-user',
+    event: 'order_processed',
+  })
+})
 ```
 
 ### Session context
@@ -344,18 +334,15 @@ Node.js
 PostHog AI
 
 ```javascript
-posthog.withContext(
-  { sessionId: 'some-session' },
-  () => {
-    // Associated with session "some-session"
-    posthog.capture({ event: 'image_uploaded' })
-    // Overrides to "next-session"
-    posthog.capture({
-      event: 'image_uploaded',
-      properties: { $sessionId: 'next-session' }
-    })
-  }
-)
+posthog.withContext({ sessionId: 'some-session' }, () => {
+  // Associated with session "some-session"
+  posthog.capture({ event: 'image_uploaded' })
+  // Overrides to "next-session"
+  posthog.capture({
+    event: 'image_uploaded',
+    properties: { $sessionId: 'next-session' },
+  })
+})
 ```
 
 ### Custom context parameters
@@ -365,18 +352,15 @@ Node.js
 PostHog AI
 
 ```javascript
-posthog.withContext(
-  { flightNumber: 'TAC313' },
-  () => {
-    // Associated with flightNumber TAC313
-    posthog.capture({ event: 'flight_cancelled' })
-    // Overrides to PL7714
-    posthog.capture({
-      event: 'flight_cancelled',
-      properties: { flightNumber: 'PL7714' }
-    })
-  }
-)
+posthog.withContext({ flightNumber: 'TAC313' }, () => {
+  // Associated with flightNumber TAC313
+  posthog.capture({ event: 'flight_cancelled' })
+  // Overrides to PL7714
+  posthog.capture({
+    event: 'flight_cancelled',
+    properties: { flightNumber: 'PL7714' },
+  })
+})
 ```
 
 ## Feature flags
@@ -394,11 +378,18 @@ Node.js
 PostHog AI
 
 ```javascript
-const isFeatureFlagEnabled = await client.isFeatureEnabled('flag-key', 'distinct_id_of_your_user')
+const isFeatureFlagEnabled = await client.isFeatureEnabled(
+  'flag-key',
+  'distinct_id_of_your_user'
+)
 if (isFeatureFlagEnabled) {
-    // Your code if the flag is enabled
-    // Optional: fetch the payload
-    const matchedFlagPayload = await client.getFeatureFlagPayload('flag-key', 'distinct_id_of_your_user', isFeatureFlagEnabled)
+  // Your code if the flag is enabled
+  // Optional: fetch the payload
+  const matchedFlagPayload = await client.getFeatureFlagPayload(
+    'flag-key',
+    'distinct_id_of_your_user',
+    isFeatureFlagEnabled
+  )
 }
 ```
 
@@ -409,11 +400,19 @@ Node.js
 PostHog AI
 
 ```javascript
-const enabledVariant = await client.getFeatureFlag('flag-key', 'distinct_id_of_your_user')
-if (enabledVariant === 'variant-key') {  // replace 'variant-key' with the key of your variant
-    // Do something differently for this user
-    // Optional: fetch the payload
-    const matchedFlagPayload = await client.getFeatureFlagPayload('flag-key', 'distinct_id_of_your_user', enabledVariant)
+const enabledVariant = await client.getFeatureFlag(
+  'flag-key',
+  'distinct_id_of_your_user'
+)
+if (enabledVariant === 'variant-key') {
+  // replace 'variant-key' with the key of your variant
+  // Do something differently for this user
+  // Optional: fetch the payload
+  const matchedFlagPayload = await client.getFeatureFlagPayload(
+    'flag-key',
+    'distinct_id_of_your_user',
+    enabledVariant
+  )
 }
 ```
 
@@ -435,11 +434,11 @@ PostHog AI
 
 ```javascript
 client.capture({
-    distinctId: 'distinct_id_of_your_user',
-    event: 'event_name',
-    properties: {
-        '$feature/feature-flag-key': 'variant-key' // replace feature-flag-key with your flag key. Replace 'variant-key' with the key of your variant
-    },
+  distinctId: 'distinct_id_of_your_user',
+  event: 'event_name',
+  properties: {
+    '$feature/feature-flag-key': 'variant-key', // replace feature-flag-key with your flag key. Replace 'variant-key' with the key of your variant
+  },
 })
 ```
 
@@ -457,9 +456,9 @@ PostHog AI
 
 ```javascript
 client.capture({
-    distinctId: 'distinct_id_of_your_user',
-    event: 'event_name',
-    sendFeatureFlags: true,
+  distinctId: 'distinct_id_of_your_user',
+  event: 'event_name',
+  sendFeatureFlags: true,
 })
 ```
 
@@ -473,21 +472,21 @@ PostHog AI
 
 ```javascript
 client.capture({
-    distinctId: 'distinct_id_of_your_user',
-    event: 'event_name',
-    sendFeatureFlags: {
-        onlyEvaluateLocally: true,
-        personProperties: { plan: 'premium' },
-        groupProperties: { org: { tier: 'enterprise' } }
-    }
+  distinctId: 'distinct_id_of_your_user',
+  event: 'event_name',
+  sendFeatureFlags: {
+    onlyEvaluateLocally: true,
+    personProperties: { plan: 'premium' },
+    groupProperties: { org: { tier: 'enterprise' } },
+  },
 })
 ```
 
 #### Performance considerations
 
--   **With local evaluation**: When [local evaluation](/docs/feature-flags/local-evaluation.md) is configured, setting `sendFeatureFlags: true` will **not** make additional server requests. Instead, it uses the locally cached feature flags, and it provides an interface for including person and/or group properties needed to evaluate the flags in the context of the event, if required.
+- **With local evaluation**: When [local evaluation](/docs/feature-flags/local-evaluation.md) is configured, setting `sendFeatureFlags: true` will **not** make additional server requests. Instead, it uses the locally cached feature flags, and it provides an interface for including person and/or group properties needed to evaluate the flags in the context of the event, if required.
 
--   **Without local evaluation**: PostHog will make an additional request to fetch feature flag information before capturing the event, which adds delay.
+- **Without local evaluation**: PostHog will make an additional request to fetch feature flag information before capturing the event, which adds delay.
 
 #### Breaking change in v5.5.0
 
@@ -517,7 +516,7 @@ Capturing `$feature_flag_called` events enable PostHog to know when a flag was a
 1.  You call `posthog.getFeatureFlag()` or `posthog.isFeatureEnabled()`, AND
 2.  It's a new user, or the value of the flag has changed.
 
-> *Note:* Tracking whether it's a new user or if a flag value has changed happens in a local cache. This means that if you reinitialize the PostHog client, the cache resets as well – causing `$feature_flag_called` events to be sent again when calling `getFeatureFlag` or `isFeatureEnabled`. PostHog is built to handle this, and so duplicate `$feature_flag_called` events won't affect your analytics.
+> _Note:_ Tracking whether it's a new user or if a flag value has changed happens in a local cache. This means that if you reinitialize the PostHog client, the cache resets as well – causing `$feature_flag_called` events to be sent again when calling `getFeatureFlag` or `isFeatureEnabled`. PostHog is built to handle this, and so duplicate `$feature_flag_called` events won't affect your analytics.
 
 You can disable automatically capturing `$feature_flag_called` events. For example, when you don't need the analytics, or it's being called at such a high volume that sending events slows things down.
 
@@ -529,11 +528,12 @@ PostHog AI
 
 ```javascript
 const isFeatureFlagEnabled = await client.isFeatureEnabled(
-    'flag-key',
-    'distinct_id_of_your_user',
-    {
-        'sendFeatureFlagEvents': false
-    })
+  'flag-key',
+  'distinct_id_of_your_user',
+  {
+    sendFeatureFlagEvents: false,
+  }
+)
 ```
 
 ### Advanced: Overriding server properties
@@ -549,27 +549,23 @@ Node.js
 PostHog AI
 
 ```javascript
-await client.getFeatureFlag(
-    'flag-key',
-    'distinct_id_of_the_user',
-    {
-        personProperties: {
-            'property_name': 'value'
-        },
-        groups: {
-            "your_group_type": "your_group_id",
-            "another_group_type": "your_group_id",
-        },
-        groupProperties: {
-            'your_group_type': {
-                'group_property_name': 'value'
-            },
-            'another_group_type': {
-                'group_property_name': 'value'
-            }
-        },
-    }
-)
+await client.getFeatureFlag('flag-key', 'distinct_id_of_the_user', {
+  personProperties: {
+    property_name: 'value',
+  },
+  groups: {
+    your_group_type: 'your_group_id',
+    another_group_type: 'your_group_id',
+  },
+  groupProperties: {
+    your_group_type: {
+      group_property_name: 'value',
+    },
+    another_group_type: {
+      group_property_name: 'value',
+    },
+  },
+})
 ```
 
 ### Overriding GeoIP properties
@@ -580,22 +576,22 @@ You can override GeoIP properties by including them in the `person_properties` p
 
 The following GeoIP properties can be overridden:
 
--   `$geoip_country_code`
--   `$geoip_country_name`
--   `$geoip_city_name`
--   `$geoip_city_confidence`
--   `$geoip_continent_code`
--   `$geoip_continent_name`
--   `$geoip_latitude`
--   `$geoip_longitude`
--   `$geoip_postal_code`
--   `$geoip_subdivision_1_code`
--   `$geoip_subdivision_1_name`
--   `$geoip_subdivision_2_code`
--   `$geoip_subdivision_2_name`
--   `$geoip_subdivision_3_code`
--   `$geoip_subdivision_3_name`
--   `$geoip_time_zone`
+- `$geoip_country_code`
+- `$geoip_country_name`
+- `$geoip_city_name`
+- `$geoip_city_confidence`
+- `$geoip_continent_code`
+- `$geoip_continent_name`
+- `$geoip_latitude`
+- `$geoip_longitude`
+- `$geoip_postal_code`
+- `$geoip_subdivision_1_code`
+- `$geoip_subdivision_1_name`
+- `$geoip_subdivision_2_code`
+- `$geoip_subdivision_2_name`
+- `$geoip_subdivision_3_code`
+- `$geoip_subdivision_3_name`
+- `$geoip_time_zone`
 
 Simply include any of these properties in the `person_properties` parameter alongside your other person properties when calling feature flags.
 
@@ -609,10 +605,9 @@ PostHog AI
 
 ```javascript
 const client = new PostHog('<ph_project_token>', {
-        api_host: 'https://us.i.posthog.com',
-        feature_flag_request_timeout_ms: 3000 // Time in milliseconds. Default is 3000 (3 seconds).
-    }
-)
+  api_host: 'https://us.i.posthog.com',
+  feature_flag_request_timeout_ms: 3000, // Time in milliseconds. Default is 3000 (3 seconds).
+})
 ```
 
 ### Error handling
@@ -625,29 +620,31 @@ PostHog AI
 
 ```javascript
 async function handleFeatureFlag(client, flagKey, distinctId) {
-    try {
-        const isEnabled = await client.isFeatureEnabled(flagKey, distinctId);
-        console.log(`Feature flag '${flagKey}' for user '${distinctId}' is ${isEnabled ? 'enabled' : 'disabled'}`);
-        return isEnabled;
-    } catch (error) {
-        console.error(`Error fetching feature flag '${flagKey}': ${error.message}`);
-        // Optionally, you can return a default value or throw the error
-        // return false; // Default to disabled
-        throw error;
-    }
+  try {
+    const isEnabled = await client.isFeatureEnabled(flagKey, distinctId)
+    console.log(
+      `Feature flag '${flagKey}' for user '${distinctId}' is ${isEnabled ? 'enabled' : 'disabled'}`
+    )
+    return isEnabled
+  } catch (error) {
+    console.error(`Error fetching feature flag '${flagKey}': ${error.message}`)
+    // Optionally, you can return a default value or throw the error
+    // return false; // Default to disabled
+    throw error
+  }
 }
 // Usage example
 try {
-    const flagEnabled = await handleFeatureFlag(client, 'new-feature', 'user-123');
-    if (flagEnabled) {
-        // Implement new feature logic
-    } else {
-        // Implement old feature logic
-    }
+  const flagEnabled = await handleFeatureFlag(client, 'new-feature', 'user-123')
+  if (flagEnabled) {
+    // Implement new feature logic
+  } else {
+    // Implement old feature logic
+  }
 } catch (error) {
-    // Handle the error at a higher level
-    console.error('Feature flag check failed, using default behavior');
-    // Implement fallback logic
+  // Handle the error at a higher level
+  console.error('Feature flag check failed, using default behavior')
+  // Implement fallback logic
 }
 ```
 
@@ -695,7 +692,10 @@ Node.js
 PostHog AI
 
 ```javascript
-const variant = await client.getFeatureFlag('experiment-feature-flag-key', 'user_distinct_id')
+const variant = await client.getFeatureFlag(
+  'experiment-feature-flag-key',
+  'user_distinct_id'
+)
 if (variant === 'variant-name') {
   // do something
 }
@@ -722,7 +722,7 @@ client.groupIdentify({
     employees: 11,
   },
   // optional distinct ID to associate event with an existing person
-  distinctId: 'xyz'
+  distinctId: 'xyz',
 })
 ```
 
@@ -759,7 +759,7 @@ PostHog AI
 ```javascript
 const posthog = new PostHog('<ph_project_token>', {
   host: 'https://us.i.posthog.com',
-  disableGeoip: false
+  disableGeoip: false,
 })
 ```
 
@@ -825,9 +825,9 @@ Node.js
 PostHog AI
 
 ```javascript
-client.on("error", (err) => {
+client.on('error', (err) => {
   // Whatever handling you want
-  console.error("PostHog had an error!", err)
+  console.error('PostHog had an error!', err)
 })
 ```
 

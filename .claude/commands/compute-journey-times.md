@@ -28,20 +28,20 @@ node .claude/commands/compute-journey-times.js --no-download \
 
 ## Default hubs (12 total)
 
-| Hub name (exact GTFS stop_name) | Coverage |
-|---|---|
-| `Praha hl.n.` | S1–S9, EC, IC (main railway station) |
-| `Praha Masarykovo nádraží` | S1, S2, S3 |
-| `Praha-Smíchov` | S7, S9, regional south |
-| `Praha-Holešovice` | S4, S5, S8 |
-| `Praha-Libeň` | S2, S9, north-east rail |
-| `Černý Most` | Bus — north-east suburbs |
-| `Roztyly` | Bus — south suburbs |
-| `Letňany` | Bus — north suburbs |
-| `Zličín` | Bus — west suburbs |
-| `Smíchovské nádraží` | Bus — south-west suburbs |
-| `Florenc` | Bus — central terminal, all directions |
-| `Háje` | Bus — south-east suburbs |
+| Hub name (exact GTFS stop_name) | Coverage                               |
+| ------------------------------- | -------------------------------------- |
+| `Praha hl.n.`                   | S1–S9, EC, IC (main railway station)   |
+| `Praha Masarykovo nádraží`      | S1, S2, S3                             |
+| `Praha-Smíchov`                 | S7, S9, regional south                 |
+| `Praha-Holešovice`              | S4, S5, S8                             |
+| `Praha-Libeň`                   | S2, S9, north-east rail                |
+| `Černý Most`                    | Bus — north-east suburbs               |
+| `Roztyly`                       | Bus — south suburbs                    |
+| `Letňany`                       | Bus — north suburbs                    |
+| `Zličín`                        | Bus — west suburbs                     |
+| `Smíchovské nádraží`            | Bus — south-west suburbs               |
+| `Florenc`                       | Bus — central terminal, all directions |
+| `Háje`                          | Bus — south-east suburbs               |
 
 To find additional hub names: `grep -i "keyword" /tmp/PID_GTFS_gen/extracted/stops.txt`
 
@@ -57,11 +57,11 @@ To find additional hub names: `grep -i "keyword" /tmp/PID_GTFS_gen/extracted/sto
 
 ## Output additions to stops.json
 
-| Field | Type | Description |
-|---|---|---|
-| `stop.journeyMinutes` | `number?` | Min journey time in minutes from any hub |
-| `_meta.journeyHubs` | `string[]` | Hub names used in this run |
-| `_meta.journeyComputedAt` | `string` | ISO timestamp of the run |
+| Field                     | Type       | Description                              |
+| ------------------------- | ---------- | ---------------------------------------- |
+| `stop.journeyMinutes`     | `number?`  | Min journey time in minutes from any hub |
+| `_meta.journeyHubs`       | `string[]` | Hub names used in this run               |
+| `_meta.journeyComputedAt` | `string`   | ISO timestamp of the run                 |
 
 ## Limitations
 

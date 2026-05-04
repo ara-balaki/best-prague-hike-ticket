@@ -7,6 +7,12 @@
     "title": "Hledač jízdenek na výlety z Prahy",
     "description": "Najděte nejlepší jízdenku pro výlet na příměstské zastávky kolem Prahy. Zóny se počítají od středu města (P, 0, B)."
   },
+  "from": {
+    "label": "Výchozí místo",
+    "placeholder": "např. Praha hl.n., Smíchovské nádraží",
+    "required": "Vyberte výchozí místo",
+    "zoneOption": "Zóna {{zone}} — všechny zastávky"
+  },
   "destination": {
     "label": "Cílová zastávka",
     "placeholder": "např. Karlštejn, Turnov",

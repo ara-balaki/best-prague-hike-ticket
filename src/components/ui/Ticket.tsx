@@ -1,29 +1,29 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next'
 
 import {
   partyLabel as defaultPartyLabel,
   ticketName,
   ticketValidity,
-} from "../../lib/ticketDisplay";
-import type { ITicket } from "../../types";
+} from '../../lib/ticketDisplay'
+import type { ITicket } from '../../types'
 
 interface TicketProps {
-  ticket: ITicket;
-  routeFrom: string;
-  routeTo: string;
-  zoneLabel: string;
-  partyLabel?: string;
+  ticket: ITicket
+  routeFrom: string
+  routeTo: string
+  zoneLabel: string
+  partyLabel?: string
 }
 
 interface CardProps {
-  name: string;
-  price: string;
-  validity: string;
-  routeFrom: string;
-  routeTo: string;
-  zoneLabel: string;
-  partyDisplay: string;
-  labels: { valid: string; route: string; hikers: string; brand: string };
+  name: string
+  price: string
+  validity: string
+  routeFrom: string
+  routeTo: string
+  zoneLabel: string
+  partyDisplay: string
+  labels: { valid: string; route: string; hikers: string; brand: string }
 }
 
 function TicketCard({
@@ -41,36 +41,36 @@ function TicketCard({
       <Perforation />
       <div
         className="flex h-full flex-col justify-between"
-        style={{ padding: "3.2cqi 4cqi 3.2cqi 5.5cqi" }}
+        style={{ padding: '3.2cqi 4cqi 3.2cqi 5.5cqi' }}
       >
         {/* Top: brand + name left, price right */}
         <div
           className="flex items-start justify-between"
-          style={{ gap: "1cqi" }}
+          style={{ gap: '1cqi' }}
         >
           <div>
             <p
               className="font-semibold uppercase text-forest leading-none"
-              style={{ fontSize: "2cqi", letterSpacing: "0.1em" }}
+              style={{ fontSize: '2cqi', letterSpacing: '0.1em' }}
             >
               {labels.brand}
             </p>
             <h3
               className="font-bold text-forest leading-tight"
-              style={{ marginTop: "0.3cqi", fontSize: "3.2cqi" }}
+              style={{ marginTop: '0.3cqi', fontSize: '3.2cqi' }}
             >
               {name}
             </h3>
             <div className="mt-2">
               <p
                 className="text-muted leading-none"
-                style={{ fontSize: "2cqi" }}
+                style={{ fontSize: '2cqi' }}
               >
                 {labels.valid}
               </p>
               <p
                 className="font-medium text-black"
-                style={{ marginTop: "0.3cqi", fontSize: "2.4cqi" }}
+                style={{ marginTop: '0.3cqi', fontSize: '2.4cqi' }}
               >
                 {validity}
               </p>
@@ -78,7 +78,7 @@ function TicketCard({
           </div>
           <p
             className="shrink-0 font-bold text-forest"
-            style={{ fontSize: "5.4cqi" }}
+            style={{ fontSize: '5.4cqi' }}
           >
             {price}
           </p>
@@ -88,35 +88,35 @@ function TicketCard({
         <div aria-hidden className="border-t-2 border-dashed border-amber" />
 
         {/* Bottom: info left, mountains right */}
-        <div className="flex items-end justify-between" style={{ gap: "1cqi" }}>
-          <div className="flex" style={{ gap: "2cqi" }}>
+        <div className="flex items-end justify-between" style={{ gap: '1cqi' }}>
+          <div className="flex" style={{ gap: '2cqi' }}>
             <div>
               <p
                 className="text-muted leading-none"
-                style={{ fontSize: "2cqi" }}
+                style={{ fontSize: '2cqi' }}
               >
                 {labels.route}
               </p>
               <p
                 className="font-semibold text-black"
-                style={{ marginTop: "0.3cqi", fontSize: "2.4cqi" }}
+                style={{ marginTop: '0.3cqi', fontSize: '2.4cqi' }}
               >
                 {routeFrom} → {routeTo}
               </p>
-              <p className="text-muted" style={{ fontSize: "2cqi" }}>
+              <p className="text-muted" style={{ fontSize: '2cqi' }}>
                 {zoneLabel}
               </p>
             </div>
             <div>
               <p
                 className="text-muted leading-none"
-                style={{ fontSize: "2cqi" }}
+                style={{ fontSize: '2cqi' }}
               >
                 {labels.hikers}
               </p>
               <p
                 className="font-medium text-black"
-                style={{ marginTop: "0.3cqi", fontSize: "2.4cqi" }}
+                style={{ marginTop: '0.3cqi', fontSize: '2.4cqi' }}
               >
                 {partyDisplay}
               </p>
@@ -126,7 +126,7 @@ function TicketCard({
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export function Ticket({
@@ -136,18 +136,18 @@ export function Ticket({
   zoneLabel,
   partyLabel,
 }: TicketProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
 
-  const name = ticketName(ticket, t);
-  const validity = ticketValidity(ticket, t);
-  const partyDisplay = partyLabel ?? defaultPartyLabel(ticket.party, t);
+  const name = ticketName(ticket, t)
+  const validity = ticketValidity(ticket, t)
+  const partyDisplay = partyLabel ?? defaultPartyLabel(ticket.party, t)
 
   const labels = {
-    brand: t("ticket.brand"),
-    valid: t("ticket.validLabel"),
-    route: t("ticket.routeLabel"),
-    hikers: t("ticket.hikersLabel"),
-  };
+    brand: t('ticket.brand'),
+    valid: t('ticket.validLabel'),
+    route: t('ticket.routeLabel'),
+    hikers: t('ticket.hikersLabel'),
+  }
 
   return (
     <div className="@container mx-auto w-full sm:max-w-126 -rotate-2">
@@ -162,7 +162,7 @@ export function Ticket({
         labels={labels}
       />
     </div>
-  );
+  )
 }
 
 function Perforation() {
@@ -175,7 +175,7 @@ function Perforation() {
         <span key={i} className="block size-1.5 rounded-full bg-amber" />
       ))}
     </div>
-  );
+  )
 }
 
 function Mountains() {
@@ -191,5 +191,5 @@ function Mountains() {
         <path d="M9 0 L18 14 L0 14 Z" />
       </svg>
     </div>
-  );
+  )
 }

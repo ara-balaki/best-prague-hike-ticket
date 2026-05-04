@@ -8,11 +8,11 @@ Enter your destination stop and group size — the app looks up the relevant zon
 
 Three ticket types are covered:
 
-| Group | Ticket | Price |
-|---|---|---|
-| 1 adult | Regional Day Ticket (zones 1–13) or Whole Network | 168 / 288 Kč |
-| 1 adult + up to 2 children | Family Day Ticket | 190 Kč |
-| 2 adults + up to 4 children | Family Day Ticket | 370 Kč |
+| Group                       | Ticket                                            | Price        |
+| --------------------------- | ------------------------------------------------- | ------------ |
+| 1 adult                     | Regional Day Ticket (zones 1–13) or Whole Network | 168 / 288 Kč |
+| 1 adult + up to 2 children  | Family Day Ticket                                 | 190 Kč       |
+| 2 adults + up to 4 children | Family Day Ticket                                 | 370 Kč       |
 
 Family tickets are valid **until 4:00 AM the following day**, not a rolling 24 hours.
 

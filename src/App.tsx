@@ -1,78 +1,83 @@
-import i18n from "i18next";
-import { useEffect, useState } from "react";
-import { FormProvider, useForm, useWatch } from "react-hook-form";
-import { Trans, useTranslation } from "react-i18next";
+import i18n from 'i18next'
+import { useEffect, useState } from 'react'
+import { FormProvider, useForm, useWatch } from 'react-hook-form'
+import { Trans, useTranslation } from 'react-i18next'
 
-import { HybridStep } from "./components/steps/HybridStep";
-import { ResultStep } from "./components/steps/ResultStep";
-import { useAnalytics } from "./lib/analytics";
-import { cheapestTicket } from "./lib/ranking";
-import { resolveTrip } from "./lib/trip";
-import type { FormValues, IStop, IStopsData } from "./types";
+import { Form } from './components/Form'
+import { ResultStep } from './components/steps/ResultStep'
+import { useAnalytics } from './lib/analytics'
+import { cheapestTicket } from './lib/ranking'
+import { resolveTrip } from './lib/trip'
+import type { FormValues, IStopsData, Stop } from './types'
 
 function useDocumentMeta() {
-  const { t, i18n: inst } = useTranslation();
+  const { t, i18n: inst } = useTranslation()
   useEffect(() => {
-    document.documentElement.lang = inst.language;
-    document.title = t("meta.title");
+    document.documentElement.lang = inst.language
+    document.title = t('meta.title')
     const set = (sel: string, val: string) =>
-      document.querySelector(sel)?.setAttribute("content", val);
-    set('meta[name="description"]', t("meta.description"));
-    set('meta[property="og:title"]', t("meta.title"));
-    set('meta[property="og:description"]', t("meta.description"));
-    set('meta[name="twitter:title"]', t("meta.title"));
-    set('meta[name="twitter:description"]', t("meta.description"));
-  }, [inst.language, t]);
+      document.querySelector(sel)?.setAttribute('content', val)
+    set('meta[name="description"]', t('meta.description'))
+    set('meta[property="og:title"]', t('meta.title'))
+    set('meta[property="og:description"]', t('meta.description'))
+    set('meta[name="twitter:title"]', t('meta.title'))
+    set('meta[name="twitter:description"]', t('meta.description'))
+  }, [inst.language, t])
 }
 
 function App() {
-  useDocumentMeta();
-  const { t } = useTranslation();
-  const [stops, setStops] = useState<IStop[]>([]);
-  const [view, setView] = useState<"form" | "result">("form");
-  const analytics = useAnalytics();
+  useDocumentMeta()
+  const { t } = useTranslation()
+  const [stops, setStops] = useState<Stop[]>([])
+  const [view, setView] = useState<'form' | 'result'>('form')
+  const analytics = useAnalytics()
 
   useEffect(() => {
-    fetch("/stops.json")
+    fetch('/stops.json')
       .then((r) => r.json())
-      .then((data: IStopsData) => setStops(data.stops));
-  }, []);
+      .then((data: IStopsData) => setStops(data.stops))
+  }, [])
 
   const form = useForm<FormValues>({
-    mode: "onTouched",
+    mode: 'onTouched',
     defaultValues: {
-      stop: "",
-      transport: "all" as const,
+      from: '',
+      to: '',
+      transportFilter: 'all' as const,
       hasPraguePass: false,
     },
-  });
+  })
 
   const goToResult = async () => {
-    const isValid = await form.trigger(["stop", "party"]);
-    if (!isValid) return;
-    const trip = resolveTrip(form.getValues(), stops);
-    if (trip) analytics.ticketFound(trip, cheapestTicket(trip));
-    setView("result");
-  };
+    const isValid = await form.trigger(['from', 'to'])
+    if (!isValid) return
+    const trip = resolveTrip(form.getValues(), stops)
+    if (trip) analytics.ticketFound(trip, cheapestTicket(trip))
+    setView('result')
+  }
 
-  const goToForm = () => setView("form");
+  const goToForm = () => setView('form')
 
   const resetWizard = () => {
-    const { stop: stopName, party = "single", transport = "all" } = form.getValues();
-    analytics.newSearchStarted({ stopName, party, transport });
-    form.reset();
-    setView("form");
-  };
+    const {
+      to: stopName = '',
+      party = 'single',
+      transportFilter: transport = 'all',
+    } = form.getValues()
+    analytics.newSearchStarted({ stopName, party, transport })
+    form.reset()
+    setView('form')
+  }
 
   const handlePurchaseLinkClick = () => {
-    const trip = resolveTrip(form.getValues(), stops);
-    if (!trip) return;
-    analytics.purchaseClicked(trip, cheapestTicket(trip));
-  };
+    const trip = resolveTrip(form.getValues(), stops)
+    if (!trip) return
+    analytics.purchaseClicked(trip, cheapestTicket(trip))
+  }
 
-  const stopValue = useWatch({ control: form.control, name: "stop" });
-  const partyValue = useWatch({ control: form.control, name: "party" });
-  const canContinue = view === "form" ? !!stopValue && !!partyValue : true;
+  const fromValue = useWatch({ control: form.control, name: 'from' })
+  const toValue = useWatch({ control: form.control, name: 'to' })
+  const canContinue = view === 'form' ? !!fromValue && !!toValue : true
 
   return (
     <FormProvider {...form}>
@@ -84,28 +89,30 @@ function App() {
           >
             <div className="flex flex-1 flex-col gap-5">
               <div className="relative flex items-center justify-center">
-                <p className="text-3xl" aria-hidden>⛰️</p>
+                <p className="text-3xl" aria-hidden>
+                  ⛰️
+                </p>
                 <LanguageSwitcher />
               </div>
-              {view === "form" && (
+              {view === 'form' && (
                 <h1 className="text-center text-2xl font-bold text-forest sm:text-3xl">
-                  {t("app.title")}
+                  {t('app.title')}
                 </h1>
               )}
-              {view === "form" && (
+              {view === 'form' && (
                 <p className="text-center text-base leading-relaxed text-muted">
-                  {t("app.description")}
+                  {t('app.description')}
                 </p>
               )}
               <div className="flex flex-1 flex-col">
-                {view === "form" && <HybridStep stops={stops} />}
-                {view === "result" && <ResultStep stops={stops} />}
+                <Form stops={stops} />
+                {view === 'result' && <ResultStep stops={stops} />}
               </div>
               <div className="mt-auto">
                 <NavButtons
-                  isResult={view === "result"}
+                  isResult={view === 'result'}
                   canContinue={canContinue}
-                  showBack={view === "result"}
+                  showBack={view === 'result'}
                   onBack={goToForm}
                   onNext={goToResult}
                   onReset={resetWizard}
@@ -132,18 +139,18 @@ function App() {
         </div>
       </div>
     </FormProvider>
-  );
+  )
 }
 
 function LanguageSwitcher() {
-  const { i18n: inst } = useTranslation();
-  const analytics = useAnalytics();
+  const { i18n: inst } = useTranslation()
+  const analytics = useAnalytics()
 
   function toggle() {
-    const next = inst.language === "en" ? "cs" : "en";
-    i18n.changeLanguage(next);
-    localStorage.setItem("lang", next);
-    analytics.languageChanged(next);
+    const next = inst.language === 'en' ? 'cs' : 'en'
+    i18n.changeLanguage(next)
+    localStorage.setItem('lang', next)
+    analytics.languageChanged(next)
   }
 
   return (
@@ -152,19 +159,19 @@ function LanguageSwitcher() {
       onClick={toggle}
       className="absolute right-0 rounded-lg px-2 py-1 text-xs font-semibold text-muted hover:text-forest"
     >
-      {inst.language === "en" ? "CS" : "EN"}
+      {inst.language === 'en' ? 'CS' : 'EN'}
     </button>
-  );
+  )
 }
 
 interface NavButtonsProps {
-  isResult: boolean;
-  canContinue: boolean;
-  showBack: boolean;
-  onBack: () => void;
-  onNext: () => void;
-  onReset: () => void;
-  onPurchaseLinkClick: () => void;
+  isResult: boolean
+  canContinue: boolean
+  showBack: boolean
+  onBack: () => void
+  onNext: () => void
+  onReset: () => void
+  onPurchaseLinkClick: () => void
 }
 
 function NavButtons({
@@ -176,7 +183,7 @@ function NavButtons({
   onReset,
   onPurchaseLinkClick,
 }: NavButtonsProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
 
   if (isResult) {
     return (
@@ -202,10 +209,10 @@ function NavButtons({
           onClick={onReset}
           className="flex-1 rounded-xl border cursor-pointer border-forest/30 bg-cream-card py-3 text-sm font-semibold text-forest hover:bg-forest/5"
         >
-          {t("nav.newSearch")}
+          {t('nav.newSearch')}
         </button>
       </div>
-    );
+    )
   }
 
   return (
@@ -216,7 +223,7 @@ function NavButtons({
         disabled={!canContinue}
         className="flex-1 rounded-xl py-3 text-base font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:bg-sage/40 cursor-pointer disabled:text-white/60 bg-forest"
       >
-        {t("nav.continue")}
+        {t('nav.continue')}
       </button>
       {showBack && (
         <button
@@ -224,11 +231,11 @@ function NavButtons({
           onClick={onBack}
           className="rounded-xl border border-forest/30 bg-cream-card py-3 px-6 text-sm font-semibold text-forest hover:bg-forest/5"
         >
-          {t("nav.back")}
+          {t('nav.back')}
         </button>
       )}
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
